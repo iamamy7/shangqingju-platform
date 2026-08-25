@@ -1,20 +1,23 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import { CompanyFixtureService } from "./company-fixture.service";
+import { HomePageService } from "../home/home-page.service";
 
 @Controller("companies")
 export class CompaniesController {
-  constructor(private readonly fixtures: CompanyFixtureService) {}
+  constructor(private readonly fixtures: CompanyFixtureService, private readonly home: HomePageService) {}
 
   @Post("search/resolve")
   search(@Body() body: { name?: string; countryIso2?: string; limit?: number }) {
     const candidates = this.fixtures.search(body.name || "", body.countryIso2, body.limit || 10);
+    this.home.recordSearch(body.name || "", body.countryIso2 || "GLOBAL", candidates[0]);
     return this.response(candidates.length ? "AVAILABLE" : "NO_RECORD", { candidates, total: candidates.length });
   }
 
   @Get("search")
   searchGet(@Query("q") query = "", @Query("country") country?: string) {
     const candidates = this.fixtures.search(query, country, 10);
+    this.home.recordSearch(query, country || "GLOBAL", candidates[0]);
     return this.response(candidates.length ? "AVAILABLE" : "NO_RECORD", { candidates, total: candidates.length });
   }
 

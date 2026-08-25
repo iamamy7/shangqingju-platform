@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: { lang: "zh-CN" },
-  link: [{ rel: "stylesheet", href: "/prototype/styles.css?v=formal-web-67" }],
+  link: [{ rel: "stylesheet", href: "/prototype/styles.css?v=formal-web-69" }],
   meta: [
     { name: "theme-color", content: "#ffffff" },
     { name: "viewport", content: "width=device-width, initial-scale=1" }
@@ -22,7 +22,7 @@ onMounted(() => {
   if (!document.querySelector('script[data-sqj-prototype="web"]')) {
     const script = document.createElement("script");
     script.type = "module";
-    script.src = "/prototype/app.js?v=formal-web-67";
+    script.src = "/prototype/app.js?v=formal-web-69";
     script.dataset.sqjPrototype = "web";
     document.body.appendChild(script);
   }

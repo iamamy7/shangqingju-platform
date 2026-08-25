@@ -79,6 +79,8 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
 
+  services/mock-upstream: {}
+
 packages:
 
   '@angular-devkit/core@19.2.24':

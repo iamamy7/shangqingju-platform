@@ -166,10 +166,6 @@ const mockApi = {
   },
 };
 
-const apiClient = {
-  baseUrl: window.SQJ_RUNTIME?.apiBase || "http://localhost:4000/api/v1",
-};
-
 const countryMeta = {
   CN: ["中国大陆", "🇨🇳"], HK: ["中国香港", "🇭🇰"], US: ["美国", "🇺🇸"], SG: ["新加坡", "🇸🇬"],
   GB: ["英国", "🇬🇧"], DE: ["德国", "🇩🇪"], FR: ["法国", "🇫🇷"], NL: ["荷兰", "🇳🇱"],
@@ -186,10 +182,10 @@ function mapMockCompany(company, index = 0) {
     country,
     code: company.country,
     flag,
-    registration: company.registrationNumber,
+    registration: `${company.registrationNumber}（Mock）`,
     region: company.country,
     status: company.status === "ACTIVE" ? "在营" : "已注销",
-    address: company.address || "地址信息待补充",
+    address: `${company.address}（Mock）`,
     updated: new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC",
     confidence: company.matchScore >= 0.9 ? "高" : company.matchScore >= 0.8 ? "中" : index === 0 ? "高" : "中",
     matchScore: company.matchScore,
@@ -210,20 +206,6 @@ async function callMockApi(path, options = {}) {
   });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error?.message || `Mock API ${response.status}`);
-  return payload;
-}
-
-async function callApi(path, options = {}) {
-  const response = await fetch(apiClient.baseUrl + path, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(state.authSession?.accessToken ? { Authorization: `Bearer ${state.authSession.accessToken}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.message || `服务请求失败（${response.status}）`);
   return payload;
 }
 
@@ -249,11 +231,11 @@ async function submitInvoiceApplication(orderIds, amount, source) {
 
 async function searchViaMockApi(query) {
   state.mockStatus = "connecting";
-  const country = state.searchScope === "CN" ? "&country=CN" : "";
-  const payload = await callApi(`/companies/search?q=${encodeURIComponent(query)}${country}`);
+  const sourceRoute = state.searchScope === "CN" ? "domestic" : "global";
+  const payload = await callMockApi(`/open/v1/${sourceRoute}/companies/search?q=${encodeURIComponent(query)}`);
   state.mockStatus = "online";
   state.mockRequestId = payload.requestId;
-  state.searchProvider = payload.provider?.code || "SQJ_SQLITE_100";
+  state.searchProvider = payload.provider?.code || null;
   state.searchQuery = query;
   state.searchDataState = payload.dataState;
   state.searchResults = payload.data.candidates.map(mapMockCompany);
@@ -273,13 +255,12 @@ async function loadInsights() {
 }
 
 async function loadWallet() {
-  if (!state.authSession?.accessToken) return;
   try {
-    const payload = await callApi("/account/balance");
-    state.accountBalance = payload.available;
+    const payload = await callMockApi(`/open/v1/customers/${state.customer?.id || "CUS-DEMO-0001"}/wallet`);
+    state.accountBalance = payload.data.balance;
     if (["account", "checkout"].includes(route().name)) render();
   } catch {
-    // 网络短暂不可用时保留最近一次成功读取的余额。
+    // 保留内置演示余额，确保 Mock 服务暂不可用时页面仍可测试。
   }
 }
 
@@ -381,11 +362,10 @@ const state = {
   adminLoggedIn: false,
   adminReturnAfterLogin: null,
   customer: null,
-  authSession: null,
   returnAfterLogin: null,
   pendingPurchase: null,
   checkoutAttemptId: null,
-  paymentMethod: "BALANCE",
+  paymentMethod: "WECHAT",
   invoiceRequested: false,
   invoiceType: "VAT_ORDINARY",
   invoiceProfile: {
@@ -401,7 +381,7 @@ const state = {
   invoiceApplicationOrders: new Set(["SQJ-ORD-DEMO-2408"]),
   invoicedOrderIds: new Set(),
   lastInvoiceApplication: null,
-  accountBalance: 20000,
+  accountBalance: 568,
   rechargeOpen: false,
   rechargeAmount: 100,
   rechargeMethod: "WECHAT",
@@ -418,7 +398,7 @@ const state = {
   apiBalance: 8420,
   apiPurchaseOpen: false,
   apiPurchaseProduct: null,
-  apiRechargeAmount: 800,
+  apiRechargeAmount: 50,
   apiPaymentMethod: "WECHAT",
   apiPurchaseBusy: false,
   apiLastPurchase: null,
@@ -468,7 +448,6 @@ const state = {
   agentRunState: "scheduled",
   mockTask: null,
   mockReportId: null,
-  realReport: null,
   aiMessages: [
     {
       role: "assistant",
@@ -476,55 +455,6 @@ const state = {
     },
   ],
 };
-
-const sessionStateKey = "sqj-formal-session-v2";
-
-function restoreSessionState() {
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(sessionStateKey) || "null");
-    if (!saved || typeof saved !== "object") return;
-    Object.assign(state, saved);
-    state.selectedModules = new Set(saved.selectedModules || ["M01", "M03", "M08"]);
-    state.invoiceApplicationOrders = new Set(saved.invoiceApplicationOrders || ["SQJ-ORD-DEMO-2408"]);
-    state.invoicedOrderIds = new Set(saved.invoicedOrderIds || []);
-    state.selectedCompany = companies.find((company) => company.id === saved.selectedCompanyId) || companies[0];
-  } catch (_) {
-    sessionStorage.removeItem(sessionStateKey);
-  }
-}
-
-function persistSessionState() {
-  try {
-    sessionStorage.setItem(sessionStateKey, JSON.stringify({
-      loggedIn: state.loggedIn,
-      adminLoggedIn: state.adminLoggedIn,
-      customer: state.customer,
-      authSession: state.authSession,
-      locale: state.locale,
-      lastOrder: state.lastOrder,
-      mockTask: state.mockTask,
-      mockReportId: state.mockReportId,
-      realReport: state.realReport,
-      selectedCompanyId: state.selectedCompany?.id,
-      selectedModules: [...state.selectedModules],
-      invoiceApplicationOrders: [...state.invoiceApplicationOrders],
-      invoicedOrderIds: [...state.invoicedOrderIds],
-      invoiceProfile: state.invoiceProfile,
-      accountBalance: state.accountBalance,
-      apiBalance: state.apiBalance,
-      apiKeys: state.apiKeys,
-      adminModels: state.adminModels,
-      adminSources: state.adminSources,
-      adminReviewItems: state.adminReviewItems,
-      adminReportPrices: state.adminReportPrices,
-      adminApiPrices: state.adminApiPrices,
-    }));
-  } catch (_) {
-    // Mock 联调阶段即使浏览器禁用会话存储，当前页面仍可正常使用。
-  }
-}
-
-restoreSessionState();
 
 let apiDetailScrollCleanup = null;
 
@@ -698,8 +628,6 @@ function route() {
   return { name, params: new URLSearchParams(queryString) };
 }
 
-let lastRenderedRoute = null;
-
 function go(name) {
   location.hash = `#/${name}`;
 }
@@ -791,13 +719,7 @@ function renderPreservingScroll() {
 
 function completeLogin(session) {
   state.loggedIn = true;
-  state.authSession = session?.session || session?.authSession || state.authSession;
-  const user = session?.user;
-  state.customer = session?.customer || (user ? {
-    id: user.id,
-    mobileMasked: user.phone ? `${user.phone.slice(0, 3)}****${user.phone.slice(-4)}` : user.displayName,
-  } : { id: "U-8888", mobileMasked: "138****8888" });
-  loadWallet();
+  state.customer = session?.customer || { id: "CUS-DEMO-0001", mobileMasked: "138****8888" };
   const target = state.returnAfterLogin || "home";
   state.returnAfterLogin = null;
   if (["progress", "report"].includes(target.split("?")[0]) && !hasPaidReportAccess()) {
@@ -811,7 +733,6 @@ function completeLogin(session) {
 function completeLogout(target = "home") {
   state.loggedIn = false;
   state.customer = null;
-  state.authSession = null;
   state.returnAfterLogin = null;
   state.rechargeOpen = false;
   state.invoiceApplicationOpen = false;
@@ -1181,7 +1102,7 @@ function renderLogin() {
   ];
   const qrCells = [1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,0,0,1,0,1,0,0,0,1,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,1,1].map((on)=>`<i class="${on?"on":""}"></i>`).join("");
   return webShell(`<section class="login-page">
-    <div class="login-promise platform-promo${apiReturn?" developer-promo":""}"><a href="#/home">${icon("arrow",15)} ${tr("返回首页", "Back home")}</a><span class="kicker">${apiReturn?"DEVELOPER ACCESS":"ACCOUNT ACCESS"}</span><h1>${apiReturn?tr("全球企业数据，接入即用", "Global company data, ready to integrate."):tr("看清企业，做对决定。", "Know the company. Make the right call.")}</h1><p>${apiReturn?tr("通过 API、CLI 与 MCP 按需接入 33 个全球企业数据能力；权限、计费和调用记录清晰可追踪。", "Access 33 global company data capabilities through API, CLI and MCP with traceable permissions, billing and usage."):tr("从企业检索到调查报告，用清晰、可追溯的信息支持每一次合作、投资与采购判断。", "From company search to research reports, use clear and traceable intelligence for every partnership, investment and procurement decision.")}</p><div class="login-promo-actions"><a href="${apiReturn?"#/api-market":"#/home"}">${apiReturn?tr("浏览数据能力", "Browse data capabilities"):tr("开始查企业", "Research a company")} ${icon("arrow",15)}</a><a href="${apiReturn?"#/api-docs":"#/insights"}">${apiReturn?tr("查看开发文档", "View developer documentation"):tr("阅读热门资讯", "Read market intelligence")}</a></div><div class="login-promo-grid">${promoCards.map(([i,title,note])=>`<article><span>${icon(i,19)}</span><strong>${title}</strong><p>${note}</p></article>`).join("")}</div></div>
+    <div class="login-promise platform-promo${apiReturn?" developer-promo":""}"><a href="#/home">${icon("arrow",15)} ${tr("返回首页", "Back home")}</a><span class="kicker">${apiReturn?"DEVELOPER ACCESS":"ACCOUNT ACCESS"}</span><h1>${apiReturn?tr("全球企业数据，接入即用", "Global company data, ready to integrate."):tr("一个账户，查企业、买报告、管发票", "One account for research, reports and invoices")}</h1><p>${apiReturn?tr("通过 API、CLI 与 MCP 按需接入 33 个全球企业数据能力；权限、计费和调用记录清晰可追踪。", "Access 33 global company data capabilities through API, CLI and MCP with traceable permissions, billing and usage."):tr("登录后继续企业检索，查看已购报告，并统一管理订单、账户余额与开票申请。", "Sign in to continue company research, view purchased reports and manage orders, balance and invoice requests.")}</p><div class="login-promo-actions"><a href="${apiReturn?"#/api-market":"#/home"}">${apiReturn?tr("浏览数据能力", "Browse data capabilities"):tr("开始查企业", "Research a company")} ${icon("arrow",15)}</a><a href="${apiReturn?"#/api-docs":"#/insights"}">${apiReturn?tr("查看开发文档", "View developer documentation"):tr("阅读热门资讯", "Read market intelligence")}</a></div><div class="login-promo-grid">${promoCards.map(([i,title,note])=>`<article><span>${icon(i,19)}</span><strong>${title}</strong><p>${note}</p></article>`).join("")}</div></div>
     <section class="login-card">
       <header><span class="login-logo"><img src="assets/sqj-mark-v4.svg" alt=""></span><div><h2>${apiReturn?tr("登录商情局开放平台", "Sign in to Shangqingju Open Platform"):tr("登录商情局", "Sign in to Shangqingju")}</h2><p>${apiReturn?tr("管理 API Key、余额和调用记录", "Manage API keys, balance and usage"):tr("首次登录将自动创建账户", "First sign-in creates your account")}</p></div></header>
       ${pending ? `<div class="auth-return-notice">${icon("lock",18)}<div><strong>${tr("登录后继续支付", "Continue to payment after sign-in")}</strong><span>${pending.companyName} · ${pending.moduleCount} ${tr("个模块", "modules")} · ${money(pending.amount)}</span><small>${tr("已选内容会保留，登录成功后自动返回收银台。", "Your selection is saved and you will return to checkout automatically.")}</small></div></div>` : ""}
@@ -1251,18 +1172,18 @@ function moduleCard(m) {
 function renderCheckout() {
   const { selected, subtotal, discount, total } = currentOrderQuote();
   const methods = [
-    { code:"WECHAT", name:"微信支付", note:"暂未开发", mark:"微", tone:"wechat" },
-    { code:"ALIPAY", name:"支付宝", note:"暂未开发", mark:"支", tone:"alipay" },
+    { code:"WECHAT", name:"微信支付", note:"演示扫码支付", mark:"微", tone:"wechat" },
+    { code:"ALIPAY", name:"支付宝", note:"演示支付宝收银台", mark:"支", tone:"alipay" },
     { code:"BALANCE", name:"账户余额", note:`可用 ${money(state.accountBalance)}`, mark:"余", tone:"balance" },
-    { code:"BANK_TRANSFER", name:"其他方式", note:"暂未开发", mark:"企", tone:"bank" },
+    { code:"BANK_TRANSFER", name:"其他方式", note:"对公转账 · 演示确认", mark:"企", tone:"bank" },
   ];
   const selectedPayment = methods.find((method) => method.code === state.paymentMethod) || methods[0];
-  const paymentAction = { WECHAT:"微信支付暂未开发", ALIPAY:"支付宝暂未开发", BALANCE:"使用账户余额支付", BANK_TRANSFER:"其他支付暂未开发" }[state.paymentMethod] || "确认支付";
+  const paymentAction = { WECHAT:"演示微信支付", ALIPAY:"演示支付宝支付", BALANCE:"使用账户余额支付", BANK_TRANSFER:"提交其他方式演示" }[state.paymentMethod] || "演示支付";
   const insufficient = state.paymentMethod === "BALANCE" && state.accountBalance < total;
   const invoicePanel = state.invoiceRequested ? `<div class="invoice-details" id="invoice-details"><div class="invoice-details-head"><div><strong>选择发票类型并填写资料</strong><span>本次填写将随订单保存，也可在“我的账户”中维护常用信息。</span></div><button data-action="save-invoice-checkout">保存发票信息</button></div>${invoiceTypeSwitchMarkup()}<div class="invoice-form">${invoiceFieldsMarkup()}</div>${state.invoiceType === "VAT_SPECIAL" ? '<div class="special-invoice-note"><strong>专票填写提示</strong><span>单位名称应与营业执照一致；地址、电话应为税务登记信息；开户行及账号应为企业基本账户信息。</span></div>' : ''}<small>演示环境只保存到当前页面与 Mock 订单，不会发送真实发票。</small></div>` : "";
   return webShell(`
     <section class="simple-page-head"><div class="breadcrumbs"><a href="#/company">返回模块选择</a><span>/</span><strong>收银台</strong></div><span class="kicker">SECURE CHECKOUT</span><h1>确认订单并选择支付方式</h1><p>你已登录，订单将关联到 ${state.customer?.mobileMasked || "当前客户账户"}，便于后续查看报告、申请发票与售后处理。</p></section>
-    <div class="mock-provider-notice">${icon("alert",18)}<div><strong>支付渠道说明</strong><span>测试购买统一使用账户余额并真实扣减；微信、支付宝和其他第三方支付暂未开发，发票上游仍为示例接口。</span></div></div>
+    <div class="mock-provider-notice">${icon("alert",18)}<div><strong>支付与开票接口示例</strong><span>微信、支付宝、对公转账与发票上游目前均为 Mock 示例，不会真实扣款或开票；后续只替换 Provider Adapter，不改变订单、支付和开票流程。</span></div></div>
     <section class="checkout-layout"><div class="checkout-main"><article class="checkout-card"><div class="card-heading"><div><span>01</span><h2>客户与调查主体</h2></div><button data-action="go" data-target="search">更换主体</button></div><div class="checkout-user">${icon("user",19)}<div><strong>${state.customer?.mobileMasked || "已登录客户"}</strong><span>客户 ID ${state.customer?.id || "CUS-DEMO-0001"}</span></div><b>${icon("check",14)} 已登录</b></div><div class="checkout-company"><div class="flag-box">${state.selectedCompany.flag}</div><div><strong>${state.selectedCompany.name}</strong><span>${state.selectedCompany.country} · ${state.selectedCompany.registration}</span><small>${state.selectedCompany.address}</small></div>${stateBadge("AVAILABLE")}</div></article><article class="checkout-card"><div class="card-heading"><div><span>02</span><h2>数据模块与承诺范围</h2></div><button data-action="go" data-target="company">修改模块</button></div><div class="checkout-modules">${selected.map((m) => `<div><div class="module-code ${m.tone}">${m.code}</div><div><strong>${m.name}</strong><span>${m.fields.slice(0,4).join(" · ")}</span><small>${m.state === "PARTIAL" ? "部分字段可用，购买前已披露" : m.state === "NO_RECORD" ? "已完成核查；未发现记录仍属于有效交付" : "预计完整交付"}</small></div><b>${money(m.price)}</b></div>`).join("")}</div></article><article class="checkout-card"><div class="card-heading"><div><span>03</span><h2>选择支付方式</h2></div></div><div class="payment-methods" role="radiogroup">${methods.map((method)=>`<button role="radio" aria-checked="${state.paymentMethod===method.code}" class="payment-option ${method.tone} ${state.paymentMethod===method.code?"selected":""}" data-action="select-payment" data-method="${method.code}"><i>${method.mark}</i><span><strong>${method.name}</strong><small>${method.note}</small></span><b>${state.paymentMethod===method.code?icon("check",15):""}</b></button>`).join("")}</div>${insufficient?'<div class="payment-warning">账户余额不足，请选择其他支付方式。</div>':""}</article><article class="checkout-card invoice-card"><div class="card-heading"><div><span>04</span><h2>发票与交付</h2></div></div><div class="invoice-choice"><button class="${!state.invoiceRequested?"selected":""}" data-action="set-invoice" data-value="false"><strong>暂不开票</strong><span>支付后可在订单中心补充</span></button><button class="${state.invoiceRequested?"selected":""}" data-action="set-invoice" data-value="true"><strong>需要发票</strong><span>选择普票或专票并填写资料</span></button></div>${invoicePanel}<p class="invoice-note">无论是否立即开票，订单都会保存客户、调查主体、模块、金额和支付记录，后续开票不需要重新下单。</p></article><article class="checkout-card"><div class="card-heading"><div><span>05</span><h2>交付与使用声明</h2></div></div><div class="terms-grid"><label><input type="checkbox" checked /> 我已了解：报告是生成时点的数据快照，不代表永久实时。</label><label><input type="checkbox" checked /> 我已了解：NO_RECORD 是有效核查结果，NO_COVERAGE 才是无法交付。</label><label><input type="checkbox" checked /> 我同意演示服务条款和数据来源声明。</label></div></article></div><aside class="order-summary"><span class="kicker">ORDER SUMMARY</span><h2>订单摘要</h2><dl><div><dt>模块数量</dt><dd>${selected.length} 项</dd></div><div><dt>模块小计</dt><dd>${money(subtotal)}</dd></div><div><dt>组合优惠</dt><dd>-${money(discount)}</dd></div><div><dt>支付方式</dt><dd>${selectedPayment.name}</dd></div><div><dt>发票状态</dt><dd>${state.invoiceRequested?`${invoiceTypeLabel()}资料待提交`:"暂不开票"}</dd></div><div class="grand-total"><dt>演示应付</dt><dd>${money(total)}</dd></div></dl><div class="delivery-box"><strong>预计 3–8 分钟</strong><span>支付成功后自动创建报告任务</span><span>PDF + 在线报告 + AI 问答</span></div><button class="button primary wide" data-action="confirm-payment" ${state.paymentBusy||insufficient?"disabled":""}>${state.paymentBusy?"正在创建订单…":`${paymentAction} ${icon("arrow",17)}`}</button><p class="fine-print">Mock 环境会创建订单和支付记录，但不会调用真实支付或扣款。</p></aside></section>
   `, "home", "checkout");
 }
@@ -1315,16 +1236,6 @@ async function printReportPdf() {
     toast("请先完成报告购买，再下载完整 PDF");
     return;
   }
-  if (state.selectedCompany?.id === "SQJ-DEMO-US-0001") {
-    const link = document.createElement("a");
-    link.href = "/prototype/downloads/Northstar_Components_%E5%95%86%E6%83%85%E5%B1%80%E4%BC%81%E4%B8%9A%E8%B0%83%E6%9F%A5%E6%8A%A5%E5%91%8A_V1.pdf";
-    link.download = "Northstar_Components_商情局企业调查报告_V1.pdf";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    toast("完整 PDF 已下载：中文字体与全部章节已嵌入");
-    return;
-  }
   if (route().name !== "report") {
     go("report");
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -1349,48 +1260,15 @@ async function printReportPdf() {
   setTimeout(cleanup, 2000);
 }
 
-const reportFieldLabels = {
-  legalName:"企业英文名称", localName:"企业当地名称", registrationNumber:"注册号", country:"国家/地区",
-  legalForm:"企业类型", status:"经营状态", foundedAt:"成立日期", registeredCapital:"注册资本",
-  registeredAddress:"注册地址", industry:"所属行业", shareholders:"股东信息", ultimateBeneficialOwners:"最终受益人",
-  ownershipPct:"持股比例", officers:"董事与管理层", role:"职务", parent:"母公司", affiliates:"关联企业",
-  currency:"币种", periods:"财务期间", revenue:"营业收入", netIncome:"净利润", totalAssets:"总资产",
-  totalLiabilities:"总负债", auditOpinion:"审计意见", courtCases:"司法案件", enforcementRecords:"被执行记录",
-  administrativePenalties:"行政处罚", screenedAt:"筛查时间", lists:"筛查名单", matches:"命中记录",
-  conclusion:"核查结论", financingRounds:"融资轮次", patents:"专利", trademarks:"商标", cyberRisk:"网络风险"
-};
-
-function flattenReportData(value, prefix = "", rows = []) {
-  if (rows.length >= 28) return rows;
-  if (value === null || value === undefined) {
-    rows.push([prefix || "数据", "未发现记录"]); return rows;
-  }
-  if (Array.isArray(value)) {
-    if (!value.length) rows.push([prefix || "记录", "0 条"]);
-    value.slice(0, 8).forEach((item, index) => flattenReportData(item, `${prefix}${prefix ? " · " : ""}第 ${index + 1} 条`, rows));
-    return rows;
-  }
-  if (typeof value === "object") {
-    Object.entries(value).forEach(([key, item]) => flattenReportData(item, `${prefix}${prefix ? " · " : ""}${reportFieldLabels[key] || key}`, rows));
-    return rows;
-  }
-  const display = typeof value === "boolean" ? (value ? "是" : "否") : typeof value === "number" ? value.toLocaleString("zh-CN") : String(value);
-  rows.push([prefix || "数据", display]);
-  return rows;
-}
-
 function reportSection(m) {
   const purchased = state.selectedModules.has(m.code);
   if (!purchased) return `<section id="section-${m.code}" class="report-section locked-section"><div class="section-number">${m.code.slice(1)}</div><div class="locked-content">${icon("lock",26)}<div><h2>${m.name}</h2><p>${m.state === "NO_COVERAGE" ? "该主体当前暂无可靠覆盖，不能购买，也不显示推测内容。" : "当前报告未购买此模块。AI 不会检索或引用该章节。"}</p></div>${m.state === "NO_COVERAGE" ? stateBadge("NO_COVERAGE") : '<button data-action="go" data-target="company">查看增购范围</button>'}</div></section>`;
-  const databaseSection = state.realReport?.sections?.find((section) => section.product?.code === m.code);
-  const databaseRows = databaseSection ? flattenReportData(databaseSection.sourceState?.data) : [];
-  const details = databaseRows.length ? databaseRows : ({
+  const details = {
     M01: [["标准名称", state.selectedCompany.name], ["当地语言名称", state.selectedCompany.localName], ["注册号", state.selectedCompany.registration], ["经营状态", "Active / 在营"], ["注册地址", state.selectedCompany.address], ["法律形式", "Corporation（演示）"]],
     M03: [["直接股东", "Northstar Holdings Ltd.（演示）"], ["持股比例", "82.0%（演示）"], ["最终受益人", "资料披露受限，需进一步核验"], ["控制路径", "1 层直接控制（演示）"]],
     M08: [["筛查结果", "未发现命中记录"], ["数据状态", "NO_RECORD"], ["筛查范围", "演示制裁名单集合"], ["筛查时间", "2026-08-16 09:58 UTC"]],
-  }[m.code] || [["模块状态", m.coverage], ["已返回字段", m.fields.slice(0,3).join("、")], ["数据提示", m.state === "PARTIAL" ? "部分年份或字段缺失，已在购买前披露。" : "已完成当前模块查询。"], ["取数时间", "2026-08-24 00:00 UTC"]]);
-  const stateLabel = databaseSection?.sourceState?.dataState || m.state;
-  return `<section id="section-${m.code}" class="report-section data-section"><div class="section-number">${m.code.slice(1)}</div><div class="section-heading-report"><span>${m.code} · ${m.name.toUpperCase()}</span><h2>${m.name}</h2><div class="section-state">${stateBadge(stateLabel)}<span>${databaseSection ? "来自商情局 100 家企业测试数据库" : "数据截止 2026-08-24 00:00 UTC"}</span></div></div><div class="evidence-table">${details.map(([k,v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join("")}</div><div class="source-note"><div>${icon("database",18)}<span><strong>来源与血缘</strong><small>${databaseSection ? "SQJ_SQLITE_100 · 已在支付时生成报告快照" : `sourceField: ${m.source}`}</small></span></div><button data-action="show-lineage">查看数据来源</button></div></section>`;
+  }[m.code] || [["模块状态", m.coverage], ["已返回字段", m.fields.slice(0,3).join("、")], ["数据提示", m.state === "PARTIAL" ? "部分年份或字段缺失，已在购买前披露。" : "已完成当前模块演示查询。"], ["取数时间", "2026-08-16 09:40 UTC"]];
+  return `<section id="section-${m.code}" class="report-section data-section"><div class="section-number">${m.code.slice(1)}</div><div class="section-heading-report"><span>${m.code} · ${m.name.toUpperCase()}</span><h2>${m.name}</h2><div class="section-state">${stateBadge(m.state)}<span>数据截止 2026-08-16 09:40 UTC</span></div></div><div class="evidence-table">${details.map(([k,v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join("")}</div><div class="source-note"><div>${icon("database",18)}<span><strong>来源与血缘</strong><small>sourceField: ${m.source}</small></span></div><button data-action="show-lineage">查看原始值与转换记录</button></div></section>`;
 }
 
 function renderAiMessage(message) {
@@ -1463,9 +1341,13 @@ function renderApiPurchasePanelLegacy() {
 function renderApiPurchasePanel() {
   if (!state.apiPurchaseOpen) return "";
   const product = apiProducts.find((item)=>item.code === state.apiPurchaseProduct);
-  const plans = [{points:200,amount:200,note:"适合首次接入和联调"},{points:800,amount:800,note:"适合个人开发者与小团队"},{points:2500,amount:2500,note:"适合高频业务调用"}];
-  const selected = plans.find((plan)=>plan.points === state.apiRechargeAmount) || plans[1];
-  return `<div class="api-purchase-mask" data-action="api-close-purchase"></div><aside class="api-purchase-panel"><header><div><span class="kicker">API BALANCE</span><h2>${product ? `开通 ${product.name}` : "充值 API 余额"}</h2><p>${product ? `${product.method} ${product.endpoint} · ${product.price===0?"免费接口":`每次成功调用 ¥${product.price}`}。接口本身与全球查完全一致。` : "充值后可调用全部 33 个全球查同源接口，按各接口原价逐次扣费。"}</p></div><button data-action="api-close-purchase" aria-label="关闭">×</button></header>${product?`<section class="api-selected-contract"><strong>本次开通接口</strong><div><code>${product.code}</code><span>${product.group}</span><b>${product.price===0?"免费":`¥${product.price} / 次`}</b></div></section>`:""}<section><strong>选择预存金额</strong><div class="api-plan-grid">${plans.map((plan)=>`<button class="${state.apiRechargeAmount===plan.points?"selected":""}" data-action="api-plan" data-points="${plan.points}"><b>充值 ¥${plan.points.toLocaleString()}</b><strong>到账 ¥${plan.amount}</strong><small>${plan.note}</small></button>`).join("")}</div></section><section><strong>支付方式</strong><div class="api-payment-grid">${[["WECHAT","微","微信支付（示例）"],["ALIPAY","支","支付宝（示例）"],["BANK_TRANSFER","企","对公转账（示例）"]].map(([code,mark,label])=>`<button class="${state.apiPaymentMethod===code?"selected":""}" data-action="api-payment" data-method="${code}"><i>${mark}</i><span>${label}</span>${state.apiPaymentMethod===code?icon("check",15):""}</button>`).join("")}</div></section><div class="api-purchase-summary"><div><span>当前 API 余额</span><strong>¥${state.apiBalance.toLocaleString()}</strong></div><div><span>充值后余额</span><strong>¥${(state.apiBalance+selected.amount).toLocaleString()}</strong></div><div><span>应付金额</span><strong>¥${selected.amount}</strong></div></div><footer><small>${icon("shield",14)} 当前为 Mock 示例，不会真实扣款；微信、支付宝、对公转账和开票待后期替换真实 Provider Adapter。</small><button data-action="confirm-api-purchase" ${state.apiPurchaseBusy?"disabled":""}>${state.apiPurchaseBusy?"正在创建订单…":"确认充值并开通"} ${icon("arrow",16)}</button></footer></aside>`;
+  const plans = [{amount:10,note:"低门槛体验"},{amount:50,note:"开发联调"},{amount:100,note:"个人常用"},{amount:500,note:"小团队使用"}];
+  const selectedAmount = Number(state.apiRechargeAmount);
+  const isPreset = plans.some((plan)=>plan.amount === selectedAmount);
+  const validAmount = Number.isFinite(selectedAmount) && selectedAmount >= 1 && selectedAmount <= 50000;
+  const amountText = validAmount ? selectedAmount.toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+  const afterBalance = validAmount ? (state.apiBalance + selectedAmount).toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+  return `<div class="api-purchase-mask" data-action="api-close-purchase"></div><aside class="api-purchase-panel"><header><div><span class="kicker">API BALANCE</span><h2>${product ? `开通 ${product.name}` : "充值 API 余额"}</h2><p>${product ? `${product.method} ${product.endpoint} · ${product.price===0?"免费接口":`每次成功调用 ¥${product.price}`}。接口本身与全球查完全一致。` : "充值后可调用全部 33 个全球查同源接口，按各接口原价逐次扣费。"}</p></div><button data-action="api-close-purchase" aria-label="关闭">×</button></header>${product?`<section class="api-selected-contract"><strong>本次开通接口</strong><div><code>${product.code}</code><span>${product.group}</span><b>${product.price===0?"免费":`¥${product.price} / 次`}</b></div></section>`:""}<section><div class="api-recharge-heading"><strong>选择充值金额</strong><span>充值多少，到账多少</span></div><div class="api-plan-grid flexible">${plans.map((plan)=>`<button class="${selectedAmount===plan.amount?"selected":""}" data-action="api-plan" data-points="${plan.amount}"><b>¥${plan.amount}</b><small>${plan.note}</small></button>`).join("")}</div><label class="api-custom-amount ${!isPreset&&validAmount?"selected":""}"><span>自定义金额</span><div><b>¥</b><input data-api-custom-amount type="number" min="1" max="50000" step="0.01" inputmode="decimal" value="${!isPreset&&validAmount?selectedAmount:""}" placeholder="最低 1 元" aria-label="自定义 API 充值金额"><em>1–50,000 元</em></div><small>支持按实际用量灵活充值，金额最多保留两位小数。</small></label></section><section><strong>支付方式</strong><div class="api-payment-grid">${[["WECHAT","微","微信支付（示例）"],["ALIPAY","支","支付宝（示例）"],["BANK_TRANSFER","企","对公转账（示例）"]].map(([code,mark,label])=>`<button class="${state.apiPaymentMethod===code?"selected":""}" data-action="api-payment" data-method="${code}"><i>${mark}</i><span>${label}</span>${state.apiPaymentMethod===code?icon("check",15):""}</button>`).join("")}</div></section><div class="api-purchase-summary"><div><span>当前 API 余额</span><strong>¥${state.apiBalance.toLocaleString()}</strong></div><div><span>充值后余额</span><strong data-api-after-balance>¥${afterBalance}</strong></div><div><span>应付金额</span><strong data-api-pay-amount>¥${amountText}</strong></div></div><footer><small>${icon("shield",14)} 当前为 Mock 示例，不会真实扣款；微信、支付宝、对公转账和开票待后期替换真实 Provider Adapter。</small><button data-action="confirm-api-purchase" ${state.apiPurchaseBusy||!validAmount?"disabled":""}>${state.apiPurchaseBusy?"正在创建订单…":"确认充值并开通"} ${icon("arrow",16)}</button></footer></aside>`;
 }
 
 function apiEndpointFor(product) {
@@ -1927,7 +1809,7 @@ function renderAdminProducts() {
 
 function renderAdminPricing() {
   const rows = modules.slice(0,8).map((module,index)=>[module.code,module.name,money(module.price),money(Math.max(19,module.price-10)),index<3?"组合优惠":"无自动优惠","生效中"]);
-  return adminShell(`${adminOpsHeader("PRICING & PROMOTION","价格与优惠","配置报告模块、全球查同源 API 单价、预存余额和组合优惠；所有变更保留审批与回滚。","创建价格版本","新价格版本已进入草稿，发布前需要审批（演示）")}${adminOpsMetrics([["当前价格版本","v1.6","2026-08-16 生效"],["在售报告 SKU","8","覆盖 4 个正式市场"],["全球查同源 API","33","按元/次原价计费"],["本月优惠成本","¥12,860","占成交额 6.4%"]])}<section class="ops-layout pricing-layout"><article class="ops-card active-version"><header><div><strong>当前生效版本</strong><span>PRICE-20260816-V16</span></div><em>已发布</em></header><h2>模块价 + API 原价同步</h2><p>报告购买 3 个及以上模块自动优惠 12%；API 接口单价与全球查保持一致，用户先充值独立 API 余额。</p><div><button data-action="admin-demo-action" data-message="已复制 v1.6 为新草稿">复制为草稿</button><button>查看审计记录</button></div></article><article class="ops-card point-packages"><header><div><strong>API 预存余额</strong><span>与前台充值页一致</span></div></header>${[["充值 ¥200","到账 ¥200"],["充值 ¥800","到账 ¥800"],["充值 ¥2,500","到账 ¥2,500"]].map(([points,price])=>`<div><span>${points}</span><strong>${price}</strong><button data-action="admin-demo-action" data-message="正在编辑 ${points} 档位">编辑</button></div>`).join("")}</article></section><section class="ops-table-card"><header><div><strong>报告模块价格</strong><span>标准价、会员价与优惠规则</span></div><div><button>批量调价</button><button>价格预览</button></div></header><div class="ops-table pricing"><div class="head"><span>模块</span><span>标准价</span><span>会员价</span><span>优惠</span><span>状态</span><span>操作</span></div>${rows.map((row)=>`<div><span><b>${row[0]}</b>${row[1]}</span><strong>${row[2]}</strong><span>${row[3]}</span><span>${row[4]}</span><em class="ok">${row[5]}</em><button data-action="admin-demo-action" data-message="已打开 ${row[0]} 调价面板">调价</button></div>`).join("")}</div></section>`, "admin-pricing");
+  return adminShell(`${adminOpsHeader("PRICING & PROMOTION","价格与优惠","配置报告模块、全球查同源 API 单价、预存余额和组合优惠；所有变更保留审批与回滚。","创建价格版本","新价格版本已进入草稿，发布前需要审批（演示）")}${adminOpsMetrics([["当前价格版本","v1.6","2026-08-16 生效"],["在售报告 SKU","8","覆盖 4 个正式市场"],["全球查同源 API","33","按元/次原价计费"],["本月优惠成本","¥12,860","占成交额 6.4%"]])}<section class="ops-layout pricing-layout"><article class="ops-card active-version"><header><div><strong>当前生效版本</strong><span>PRICE-20260816-V16</span></div><em>已发布</em></header><h2>模块价 + API 原价同步</h2><p>报告购买 3 个及以上模块自动优惠 12%；API 接口单价与全球查保持一致，用户先充值独立 API 余额。</p><div><button data-action="admin-demo-action" data-message="已复制 v1.6 为新草稿">复制为草稿</button><button>查看审计记录</button></div></article><article class="ops-card point-packages"><header><div><strong>API 充值规则</strong><span>与前台充值页一致</span></div></header>${[["快捷金额","¥10 / ¥50 / ¥100 / ¥500"],["自定义金额","¥1–¥50,000"],["到账规则","充值多少，到账多少"]].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong><button data-action="admin-demo-action" data-message="正在编辑 ${label}">编辑</button></div>`).join("")}</article></section><section class="ops-table-card"><header><div><strong>报告模块价格</strong><span>标准价、会员价与优惠规则</span></div><div><button>批量调价</button><button>价格预览</button></div></header><div class="ops-table pricing"><div class="head"><span>模块</span><span>标准价</span><span>会员价</span><span>优惠</span><span>状态</span><span>操作</span></div>${rows.map((row)=>`<div><span><b>${row[0]}</b>${row[1]}</span><strong>${row[2]}</strong><span>${row[3]}</span><span>${row[4]}</span><em class="ok">${row[5]}</em><button data-action="admin-demo-action" data-message="已打开 ${row[0]} 调价面板">调价</button></div>`).join("")}</div></section>`, "admin-pricing");
 }
 
 function renderAdminProviders() {
@@ -2267,7 +2149,7 @@ function resetDemo() {
   state.apiBalance = 8420;
   state.apiPurchaseOpen = false;
   state.apiPurchaseProduct = null;
-  state.apiRechargeAmount = 800;
+  state.apiRechargeAmount = 50;
   state.apiPaymentMethod = "WECHAT";
   state.apiPurchaseBusy = false;
   state.apiLastPurchase = null;
@@ -2396,15 +2278,15 @@ async function handleClick(event) {
   else if (action === "send-code") {
     const mobile = String(document.querySelector('input[name="mobile"]')?.value || "").trim();
     try {
-      await callApi("/auth/otp/request", { method:"POST", body:JSON.stringify({ phone: mobile }) });
-      toast(tr(`测试验证码已发送：123456`, `Test verification code: 123456`));
+      const payload = await callMockApi("/open/v1/auth/sms-codes", { method:"POST", body:JSON.stringify({ mobile }) });
+      toast(tr(`验证码已发送至 ${payload.data.mobileMasked}：原型码 123456`, `Code sent to ${payload.data.mobileMasked}: demo code 123456`));
     } catch (error) { toast(error.message); }
   }
   else if (action === "login-complete") {
     try {
-      const payload = await callApi("/auth/login/phone", { method:"POST", body:JSON.stringify({ phone:"13800008888", code:"123456" }) });
-      toast(tr("测试扫码登录成功", "Test QR sign-in successful"));
-      completeLogin(payload);
+      const payload = await callMockApi("/open/v1/auth/sessions", { method:"POST", body:JSON.stringify({ method:"WECHAT", qrToken:"demo-wechat-qr" }) });
+      toast(tr("微信扫码登录成功（演示）", "WeChat sign-in successful (demo)"));
+      completeLogin(payload.data);
     } catch (error) { toast(error.message); }
   }
   else if (action === "run-agent") {
@@ -2425,7 +2307,7 @@ async function handleClick(event) {
         state.searchResults = state.searchScope === "CN" ? [] : companies;
         state.searchDataState = state.searchResults.length ? "AMBIGUOUS" : "NO_RECORD";
         render();
-        toast(`企业数据库服务暂不可用，查询范围已切换：${error.message}`);
+        toast(`Mock API 未启动，查询范围已切换：${error.message}`);
       }
     }
   }
@@ -2434,13 +2316,13 @@ async function handleClick(event) {
     try {
       await searchViaMockApi(query);
       go("search?q=" + encodeURIComponent(query));
-      toast("已从企业数据库返回主体候选");
+      toast("已从 Mock API 返回主体候选");
     } catch (error) {
       state.mockStatus = "offline";
       state.searchQuery = query;
       state.searchResults = companies;
       go("search?q=" + encodeURIComponent(query));
-      toast(`企业数据库服务暂不可用，暂用内置数据：${error.message}`);
+      toast(`Mock API 未启动，暂用内置数据：${error.message}`);
     }
   }
   else if (action === "select-company" || action === "mini-select-company") {
@@ -2467,11 +2349,7 @@ async function handleClick(event) {
       toast("请先登录；已选模块和金额会为你保留");
     }
   }
-  else if (action === "select-payment") {
-    state.paymentMethod = target.dataset.method || "BALANCE";
-    renderPreservingScroll();
-    if (state.paymentMethod !== "BALANCE") toast("该支付方式暂未开发，请使用账户余额完成本次测试购买");
-  }
+  else if (action === "select-payment") { state.paymentMethod = target.dataset.method || "WECHAT"; renderPreservingScroll(); }
   else if (action === "set-invoice") {
     state.invoiceRequested = target.dataset.value === "true";
     renderPreservingScroll();
@@ -2498,7 +2376,6 @@ async function handleClick(event) {
       go("login");
       return toast("请先登录后再支付");
     }
-    if (state.paymentMethod !== "BALANCE") return toast("该支付方式暂未开发，请选择账户余额支付");
     const quote = currentOrderQuote();
     const missingFields = state.invoiceRequested ? missingInvoiceFields() : [];
     if (missingFields.length) {
@@ -2508,38 +2385,34 @@ async function handleClick(event) {
     state.paymentBusy = true;
     renderPreservingScroll();
     try {
-      const orderPayload = await callApi("/orders", {
+      const orderPayload = await callMockApi("/open/v1/orders", {
         method: "POST",
-        body: JSON.stringify({ companyId: state.selectedCompany.id, moduleCodes: quote.selected.map((module)=>module.code), invoiceRequested: state.invoiceRequested }),
+        headers: { "Idempotency-Key": state.checkoutAttemptId || `order-${Date.now()}` },
+        body: JSON.stringify({ customerId: state.customer?.id || "CUS-DEMO-0001", companyId: state.selectedCompany.id, modules: quote.selected.map((module)=>module.code), amount: quote.total, invoiceRequested: state.invoiceRequested, invoiceType: state.invoiceType, invoice: state.invoiceRequested ? state.invoiceProfile : null }),
       });
-      const paymentPayload = await callApi(`/orders/${orderPayload.id}/pay`, {
+      const paymentPayload = await callMockApi(`/open/v1/orders/${orderPayload.data.orderId}/payments`, {
         method: "POST",
-        body: JSON.stringify({ channel: "BALANCE" }),
+        body: JSON.stringify({ method: state.paymentMethod }),
       });
       const paymentLabels = { WECHAT:"微信支付", ALIPAY:"支付宝", BALANCE:"账户余额", BANK_TRANSFER:"其他方式（对公转账）" };
-      state.lastOrder = { ...orderPayload, ...paymentPayload, paymentLabel: paymentLabels[state.paymentMethod] };
-      if (Number.isFinite(paymentPayload.balance)) state.accountBalance = paymentPayload.balance;
+      state.lastOrder = { ...orderPayload.data, ...paymentPayload.data, paymentLabel: paymentLabels[state.paymentMethod] };
+      if (state.paymentMethod === "BALANCE" && Number.isFinite(paymentPayload.data.balance)) state.accountBalance = paymentPayload.data.balance;
       if (state.invoiceRequested) {
-        try {
-          const application = await submitInvoiceApplication([orderPayload.id], quote.total, "CHECKOUT");
-          state.lastOrder.invoiceApplication = application;
-          state.lastOrder.invoice = application.invoice;
-        } catch (_) {
-          state.lastOrder.invoice = { status:"PENDING_INFO", type:state.invoiceType };
-          toast("余额支付已完成；开票上游暂未开发，本次仅保存开票意向");
-        }
+        const application = await submitInvoiceApplication([orderPayload.data.orderId], quote.total, "CHECKOUT");
+        state.lastOrder.invoiceApplication = application;
+        state.lastOrder.invoice = application.invoice;
       }
       state.pendingPurchase = null;
       state.checkoutAttemptId = null;
-      state.mockTask = await callApi(`/report-tasks/${paymentPayload.taskId}`);
-      state.mockReportId = paymentPayload.reportId;
-      state.realReport = await callApi(`/reports/${paymentPayload.reportId}`);
-      state.progressStep = 5;
+      await createReportViaMock();
+      toast(state.invoiceRequested ? "演示支付成功，开票申请已同步提交" : "演示支付成功，订单、支付记录和报告任务均已创建");
+    } catch (error) {
+      state.mockStatus = "offline";
+      state.mockTask = null;
+      state.progressStep = 0;
       state.progressTimerActive = false;
       go("progress");
-      toast(state.invoiceRequested ? "余额支付成功，报告已从数据库生成；开票申请已提交至示例流程" : "余额支付成功，订单已落库并生成完整报告");
-    } catch (error) {
-      toast(`支付或报告生成失败：${error.message}`);
+      toast(`订单或报告任务创建失败，已降级为页面演示：${error.message}`);
     } finally {
       state.paymentBusy = false;
     }
@@ -2562,7 +2435,13 @@ async function handleClick(event) {
   else if (action === "select-recharge-amount") { state.rechargeAmount = Math.max(1, Number(target.dataset.amount) || 100); renderPreservingScroll(); }
   else if (action === "select-recharge-method") { state.rechargeMethod = target.dataset.method || "WECHAT"; renderPreservingScroll(); }
   else if (action === "confirm-recharge") {
-    toast("第三方充值暂未开发；测试账户已预置 ¥20,000，可直接使用余额支付。");
+    try {
+      const payload = await callMockApi(`/open/v1/customers/${state.customer?.id || "CUS-DEMO-0001"}/wallet/recharges`, { method:"POST", body:JSON.stringify({ amount:state.rechargeAmount, method:state.rechargeMethod }) });
+      state.accountBalance = payload.data.balance;
+      state.rechargeOpen = false;
+      renderPreservingScroll();
+      toast(`演示充值成功，当前余额 ${money(state.accountBalance)}`);
+    } catch (error) { toast(error.message); }
   }
   else if (action === "api-filter") { state.apiFilter = target.dataset.filter || "ALL"; state.apiSearch = ""; state.apiPage = 1; render(); }
   else if (action === "api-page") { state.apiPage = Math.max(1, Number(target.dataset.page) || 1); render(); }
@@ -2589,7 +2468,7 @@ async function handleClick(event) {
     renderPreservingScroll();
   }
   else if (action === "api-close-purchase") { state.apiPurchaseOpen = false; renderPreservingScroll(); }
-  else if (action === "api-plan") { state.apiRechargeAmount = Number(target.dataset.points) || 800; renderPreservingScroll(); }
+  else if (action === "api-plan") { state.apiRechargeAmount = Number(target.dataset.points) || 50; renderPreservingScroll(); }
   else if (action === "api-payment") { state.apiPaymentMethod = target.dataset.method || "WECHAT"; renderPreservingScroll(); }
   else if (action === "api-free-trial") {
     if (!state.loggedIn) { state.returnAfterLogin = "api-market"; return go("login"); }
@@ -2603,11 +2482,12 @@ async function handleClick(event) {
       go("login");
       return toast("请先登录，API 预存金额和支付方式已为你保留");
     }
-    const amounts = {200:200,800:800,2500:2500};
+    const amount = Number(state.apiRechargeAmount);
+    if (!Number.isFinite(amount) || amount < 1 || amount > 50000 || Math.round(amount * 100) !== amount * 100) return toast("请输入 1–50,000 元之间的充值金额，最多保留两位小数");
     state.apiPurchaseBusy = true;
     renderPreservingScroll();
     try {
-      const payload = await callMockApi("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:state.customer?.id || "CUS-DEMO-0001", amount:amounts[state.apiRechargeAmount], method:state.apiPaymentMethod, apiCode:state.apiPurchaseProduct }) });
+      const payload = await callMockApi("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:state.customer?.id || "CUS-DEMO-0001", amount, method:state.apiPaymentMethod, apiCode:state.apiPurchaseProduct }) });
       state.apiBalance = payload.data.balance;
       state.apiLastPurchase = payload.data;
       state.apiPurchaseOpen = false;
@@ -2728,7 +2608,7 @@ async function handleSubmit(event) {
   if (type === "search") {
     const query = String(new FormData(event.target).get("q") || "").trim();
     if (!query) return;
-    toast("正在查询企业数据库…");
+    toast("正在调用 Mock API 搜索企业…");
     try {
       await searchViaMockApi(query);
       go("search?q=" + encodeURIComponent(query));
@@ -2738,7 +2618,7 @@ async function handleSubmit(event) {
       state.searchResults = companies;
       state.searchDataState = "AMBIGUOUS";
       go("search?q=" + encodeURIComponent(query));
-      toast(`企业数据库服务暂不可用，已使用内置备用数据：${error.message}`);
+      toast(`Mock API 未启动，已使用内置备用数据：${error.message}`);
     }
   }
   else if (type === "api-search") {
@@ -2799,9 +2679,9 @@ async function handleSubmit(event) {
     if (!/^1\d{10}$/.test(mobile)) return toast("请输入正确的 11 位手机号");
     if (!/^\d{6}$/.test(code)) return toast("请输入 6 位验证码；原型可使用 123456");
     try {
-      const payload = await callApi("/auth/login/phone", { method:"POST", body:JSON.stringify({ phone:mobile, code }) });
-      toast("手机号登录成功");
-      completeLogin(payload);
+      const payload = await callMockApi("/open/v1/auth/sessions", { method:"POST", body:JSON.stringify({ method:"SMS", mobile, code }) });
+      toast("手机号登录成功（演示）");
+      completeLogin(payload.data);
     } catch (error) { toast(error.message); }
   }
   else if (type === "admin-login") {
@@ -2847,12 +2727,6 @@ function render() {
   apiDetailScrollCleanup?.();
   apiDetailScrollCleanup = null;
   const current = route().name;
-  persistSessionState();
-  if (lastRenderedRoute && current !== lastRenderedRoute && current.startsWith("admin")) {
-    state.adminDrawer = null;
-    state.adminWorkflowModal = null;
-  }
-  lastRenderedRoute = current;
   const protectedRoutes = new Set(["account","api-console","api-keys","api-usage"]);
   const isAdminRoute = current.startsWith("admin-") || current === "admin";
   if (current === "files") { go("home"); return; }
@@ -2957,38 +2831,15 @@ function render() {
       .replaceAll("充值余额并使用", "充值余额并调用")
       .replace(/¥(\d+\.\d)(?!\d)/g, (_, value) => apiMoney(value));
   }
-  if (["company", "checkout", "progress", "report"].includes(current)) {
-    markup = markup
-      .replaceAll("演示价", "测试价格")
-      .replaceAll("演示应付", "应付金额")
-      .replaceAll("我同意演示服务条款和数据来源声明。", "我同意测试服务条款和数据来源声明。")
-      .replaceAll("Mock 环境会创建订单和支付记录，但不会调用真实支付或扣款。", "余额支付会真实创建订单、扣减测试余额，并从 100 家企业数据库生成报告。")
-      .replaceAll("本报告为演示数据", "本报告使用测试数据库数据")
-      .replaceAll("唯一演示主体", "唯一企业主体")
-      .replaceAll("本报告使用演示数据验证信息层级与交互。", "本报告由商情局 100 家企业测试数据库生成，数据来源和生成时点均记录在报告内。");
-  }
-  if (current === "account") {
-    markup = markup
-      .replaceAll("演示资金", "测试账户资金")
-      .replaceAll("演示账户初始化", "测试账户初始化")
-      .replaceAll("+ ¥568", "+ ¥20,000")
-      .replaceAll("演示充值不会真实扣款；充值成功后的余额可用于报告订单支付。", "第三方充值暂未开发；测试账户已预置 ¥20,000，可用于报告订单余额支付。")
-      .replaceAll("本次演示充值", "拟充值金额")
-      .replaceAll("确认演示充值", "尝试充值");
-  }
   if (current === "api-console") {
     markup = markup.replace('<span>剩余测试额度</span><strong>8,420</strong><small>点 · 2026-09-15 到期</small>', `<span>API 预存余额</span><strong>¥${state.apiBalance.toLocaleString()}</strong><small>成功调用按全球查接口原价扣费</small>`);
   }
   if (current === "admin-api-customers" && (state.adminSubtabByRoute[current] || "overview") === "overview") {
     markup = markup.replace('<section class="ops-table-card">', `${renderAdminDeveloperMatrix()}<section class="ops-table-card">`);
   }
-  markup = markup.replaceAll(
-    "http://127.0.0.1:4190",
-    window.SQJ_RUNTIME?.publicApiBase || mockApi.baseUrl,
-  );
   markup = localizeMarkup(markup);
   app.innerHTML = markup
-    .replaceAll("SQJ-TASK-20260816-008", state.mockTask?.taskId || state.mockTask?.id || "SQJ-TASK-DEMO-008")
+    .replaceAll("SQJ-TASK-20260816-008", state.mockTask?.taskId || "SQJ-TASK-DEMO-008")
     .replaceAll("SQJ-RPT-20260816-0018", state.mockReportId || "SQJ-RPT-DEMO-0018");
   enforceEnglishDOM(app);
   const skipLink = document.querySelector(".skip-link");
@@ -3005,6 +2856,25 @@ function render() {
 document.addEventListener("click", handleClick);
 document.addEventListener("submit", handleSubmit);
 document.addEventListener("input", (event) => {
+  if (event.target.matches("[data-api-custom-amount]")) {
+    const amount = Number(event.target.value);
+    state.apiRechargeAmount = amount;
+    const valid = Number.isFinite(amount) && amount >= 1 && amount <= 50000 && Math.round(amount * 100) === amount * 100;
+    event.target.closest(".api-custom-amount")?.classList.toggle("selected", valid);
+    const panel = event.target.closest(".api-purchase-panel");
+    const amountText = valid ? amount.toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+    const afterText = valid ? (state.apiBalance + amount).toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+    if (panel) {
+      panel.querySelectorAll(".api-plan-grid button").forEach((button)=>button.classList.remove("selected"));
+      const payAmount = panel.querySelector("[data-api-pay-amount]");
+      const afterBalance = panel.querySelector("[data-api-after-balance]");
+      const confirm = panel.querySelector('[data-action="confirm-api-purchase"]');
+      if (payAmount) payAmount.textContent = `¥${amountText}`;
+      if (afterBalance) afterBalance.textContent = `¥${afterText}`;
+      if (confirm) confirm.disabled = !valid;
+    }
+    return;
+  }
   const field = event.target.dataset.invoiceField;
   if (field && Object.hasOwn(state.invoiceProfile, field)) state.invoiceProfile[field] = event.target.value;
 });

@@ -440,9 +440,8 @@ const server = http.createServer(async (req, res) => {
     const customerId = String(body?.customerId || "");
     const amount = Number(body?.amount);
     const method = String(body?.method || "").toUpperCase();
-    const allowedAmounts = new Set([200,800,2500]);
     if (!/^CUS-[A-Z0-9-]+$/.test(customerId)) return sendError(req, res, 400, "INVALID_CUSTOMER", "customerId 必须是有效测试客户。");
-    if (!allowedAmounts.has(amount)) return sendError(req, res, 400, "INVALID_API_BALANCE_AMOUNT", "API 充值金额必须是 200、800 或 2500 元。");
+    if (!Number.isFinite(amount) || amount < 1 || amount > 50000 || Math.round(amount * 100) !== amount * 100) return sendError(req, res, 400, "INVALID_API_BALANCE_AMOUNT", "API 充值金额必须在 1–50,000 元之间，最多保留两位小数。");
     if (!["WECHAT","ALIPAY","BANK_TRANSFER"].includes(method)) return sendError(req, res, 400, "INVALID_PAYMENT_METHOD", "支付方式必须是 WECHAT、ALIPAY 或 BANK_TRANSFER。");
     demoApiBalance += amount;
     const order = { balanceOrderId:`SQJ-API-${randomUUID().slice(0,8).toUpperCase()}`, customerId, apiCode:body?.apiCode || null, amount, creditedAmount:amount, currency:"CNY", method, status:"PAID", balance:demoApiBalance, paidAt:now(), demo:true, integrationMode:"MOCK_EXAMPLE", replaceWithRealProvider:true };

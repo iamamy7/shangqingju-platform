@@ -97,7 +97,7 @@ paths:
               required: [customerId, amount, method]
               properties:
                 customerId: { type: string, example: CUS-DEMO-0001 }
-                amount: { type: number, example: 800 }
+                amount: { type: number, minimum: 1, maximum: 50000, multipleOf: 0.01, example: 50, description: 支持自定义充值金额，充值多少到账多少 }
                 method: { type: string, enum: [WECHAT, ALIPAY, BANK_TRANSFER] }
                 apiCode: { type: string, example: companiesProfile }
       responses:

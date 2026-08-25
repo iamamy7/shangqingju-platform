@@ -8,7 +8,7 @@ export class DatabaseService implements OnModuleDestroy {
   readonly connection: DatabaseSync;
 
   constructor() {
-    const runtimeDir = join(process.cwd(), "runtime-data");
+    const runtimeDir = process.env.SQJ_RUNTIME_DIR || join(process.cwd(), "runtime-data");
     mkdirSync(runtimeDir, { recursive: true });
     this.connection = new DatabaseSync(join(runtimeDir, "shangqingju.sqlite"));
     this.connection.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;");
@@ -75,6 +75,66 @@ export class DatabaseService implements OnModuleDestroy {
         balance_after REAL NOT NULL,
         created_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS insight_articles (
+        id TEXT PRIMARY KEY,
+        channel TEXT NOT NULL,
+        category TEXT NOT NULL,
+        title TEXT NOT NULL,
+        title_zh TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        summary_zh TEXT NOT NULL,
+        source TEXT NOT NULL,
+        source_zh TEXT NOT NULL,
+        source_url TEXT NOT NULL,
+        source_published_at TEXT,
+        read_minutes INTEGER NOT NULL DEFAULT 6,
+        status TEXT NOT NULL,
+        collected_at TEXT NOT NULL,
+        reviewed_at TEXT,
+        reviewed_by TEXT,
+        published_at TEXT,
+        rejected_reason TEXT,
+        collection_run_id TEXT,
+        payload_json TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS insight_articles_status_published_idx
+        ON insight_articles(status, published_at DESC);
+      CREATE TABLE IF NOT EXISTS insight_collection_runs (
+        id TEXT PRIMARY KEY,
+        status TEXT NOT NULL,
+        source_count INTEGER NOT NULL,
+        candidate_count INTEGER NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        mode TEXT NOT NULL,
+        summary_json TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS insight_audit_logs (
+        id TEXT PRIMARY KEY,
+        article_id TEXT,
+        operator TEXT NOT NULL,
+        action TEXT NOT NULL,
+        note TEXT,
+        created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS homepage_content (
+        content_key TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        updated_by TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS company_search_events (
+        id TEXT PRIMARY KEY,
+        query_text TEXT NOT NULL,
+        search_scope TEXT NOT NULL,
+        company_id TEXT,
+        company_name TEXT,
+        match_score REAL,
+        queried_at TEXT NOT NULL,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
+      );
+      CREATE INDEX IF NOT EXISTS company_search_events_trending_idx
+        ON company_search_events(queried_at DESC, company_id);
     `);
   }
 

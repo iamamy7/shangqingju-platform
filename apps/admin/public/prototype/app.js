@@ -160,7 +160,7 @@ const companies = [
 ];
 
 const mockApi = {
-  baseUrl: window.SQJ_RUNTIME?.mockBase || "http://127.0.0.1:4190",
+  baseUrl: "http://127.0.0.1:4190",
   headers: {
     "X-API-Key": "sqj_test_2026_demo_key",
   },
@@ -398,7 +398,7 @@ const state = {
   apiBalance: 8420,
   apiPurchaseOpen: false,
   apiPurchaseProduct: null,
-  apiRechargeAmount: 800,
+  apiRechargeAmount: 50,
   apiPaymentMethod: "WECHAT",
   apiPurchaseBusy: false,
   apiLastPurchase: null,
@@ -455,53 +455,6 @@ const state = {
     },
   ],
 };
-
-const sessionStateKey = "sqj-formal-session-v1";
-
-function restoreSessionState() {
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(sessionStateKey) || "null");
-    if (!saved || typeof saved !== "object") return;
-    Object.assign(state, saved);
-    state.selectedModules = new Set(saved.selectedModules || ["M01", "M03", "M08"]);
-    state.invoiceApplicationOrders = new Set(saved.invoiceApplicationOrders || ["SQJ-ORD-DEMO-2408"]);
-    state.invoicedOrderIds = new Set(saved.invoicedOrderIds || []);
-    state.selectedCompany = companies.find((company) => company.id === saved.selectedCompanyId) || companies[0];
-  } catch (_) {
-    sessionStorage.removeItem(sessionStateKey);
-  }
-}
-
-function persistSessionState() {
-  try {
-    sessionStorage.setItem(sessionStateKey, JSON.stringify({
-      loggedIn: state.loggedIn,
-      adminLoggedIn: state.adminLoggedIn,
-      customer: state.customer,
-      locale: state.locale,
-      lastOrder: state.lastOrder,
-      mockTask: state.mockTask,
-      mockReportId: state.mockReportId,
-      selectedCompanyId: state.selectedCompany?.id,
-      selectedModules: [...state.selectedModules],
-      invoiceApplicationOrders: [...state.invoiceApplicationOrders],
-      invoicedOrderIds: [...state.invoicedOrderIds],
-      invoiceProfile: state.invoiceProfile,
-      accountBalance: state.accountBalance,
-      apiBalance: state.apiBalance,
-      apiKeys: state.apiKeys,
-      adminModels: state.adminModels,
-      adminSources: state.adminSources,
-      adminReviewItems: state.adminReviewItems,
-      adminReportPrices: state.adminReportPrices,
-      adminApiPrices: state.adminApiPrices,
-    }));
-  } catch (_) {
-    // Mock 联调阶段即使浏览器禁用会话存储，当前页面仍可正常使用。
-  }
-}
-
-restoreSessionState();
 
 let apiDetailScrollCleanup = null;
 
@@ -674,8 +627,6 @@ function route() {
   const [name, queryString = ""] = raw.split("?");
   return { name, params: new URLSearchParams(queryString) };
 }
-
-let lastRenderedRoute = null;
 
 function go(name) {
   location.hash = `#/${name}`;
@@ -1151,7 +1102,7 @@ function renderLogin() {
   ];
   const qrCells = [1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,0,0,1,0,1,0,0,0,1,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,1,1].map((on)=>`<i class="${on?"on":""}"></i>`).join("");
   return webShell(`<section class="login-page">
-    <div class="login-promise platform-promo${apiReturn?" developer-promo":""}"><a href="#/home">${icon("arrow",15)} ${tr("返回首页", "Back home")}</a><span class="kicker">${apiReturn?"DEVELOPER ACCESS":"ACCOUNT ACCESS"}</span><h1>${apiReturn?tr("全球企业数据，接入即用", "Global company data, ready to integrate."):tr("看清企业，做对决定。", "Know the company. Make the right call.")}</h1><p>${apiReturn?tr("通过 API、CLI 与 MCP 按需接入 33 个全球企业数据能力；权限、计费和调用记录清晰可追踪。", "Access 33 global company data capabilities through API, CLI and MCP with traceable permissions, billing and usage."):tr("从企业检索到调查报告，用清晰、可追溯的信息支持每一次合作、投资与采购判断。", "From company search to research reports, use clear and traceable intelligence for every partnership, investment and procurement decision.")}</p><div class="login-promo-actions"><a href="${apiReturn?"#/api-market":"#/home"}">${apiReturn?tr("浏览数据能力", "Browse data capabilities"):tr("开始查企业", "Research a company")} ${icon("arrow",15)}</a><a href="${apiReturn?"#/api-docs":"#/insights"}">${apiReturn?tr("查看开发文档", "View developer documentation"):tr("阅读热门资讯", "Read market intelligence")}</a></div><div class="login-promo-grid">${promoCards.map(([i,title,note])=>`<article><span>${icon(i,19)}</span><strong>${title}</strong><p>${note}</p></article>`).join("")}</div></div>
+    <div class="login-promise platform-promo${apiReturn?" developer-promo":""}"><a href="#/home">${icon("arrow",15)} ${tr("返回首页", "Back home")}</a><span class="kicker">${apiReturn?"DEVELOPER ACCESS":"ACCOUNT ACCESS"}</span><h1>${apiReturn?tr("全球企业数据，接入即用", "Global company data, ready to integrate."):tr("一个账户，查企业、买报告、管发票", "One account for research, reports and invoices")}</h1><p>${apiReturn?tr("通过 API、CLI 与 MCP 按需接入 33 个全球企业数据能力；权限、计费和调用记录清晰可追踪。", "Access 33 global company data capabilities through API, CLI and MCP with traceable permissions, billing and usage."):tr("登录后继续企业检索，查看已购报告，并统一管理订单、账户余额与开票申请。", "Sign in to continue company research, view purchased reports and manage orders, balance and invoice requests.")}</p><div class="login-promo-actions"><a href="${apiReturn?"#/api-market":"#/home"}">${apiReturn?tr("浏览数据能力", "Browse data capabilities"):tr("开始查企业", "Research a company")} ${icon("arrow",15)}</a><a href="${apiReturn?"#/api-docs":"#/insights"}">${apiReturn?tr("查看开发文档", "View developer documentation"):tr("阅读热门资讯", "Read market intelligence")}</a></div><div class="login-promo-grid">${promoCards.map(([i,title,note])=>`<article><span>${icon(i,19)}</span><strong>${title}</strong><p>${note}</p></article>`).join("")}</div></div>
     <section class="login-card">
       <header><span class="login-logo"><img src="assets/sqj-mark-v4.svg" alt=""></span><div><h2>${apiReturn?tr("登录商情局开放平台", "Sign in to Shangqingju Open Platform"):tr("登录商情局", "Sign in to Shangqingju")}</h2><p>${apiReturn?tr("管理 API Key、余额和调用记录", "Manage API keys, balance and usage"):tr("首次登录将自动创建账户", "First sign-in creates your account")}</p></div></header>
       ${pending ? `<div class="auth-return-notice">${icon("lock",18)}<div><strong>${tr("登录后继续支付", "Continue to payment after sign-in")}</strong><span>${pending.companyName} · ${pending.moduleCount} ${tr("个模块", "modules")} · ${money(pending.amount)}</span><small>${tr("已选内容会保留，登录成功后自动返回收银台。", "Your selection is saved and you will return to checkout automatically.")}</small></div></div>` : ""}
@@ -1390,9 +1341,13 @@ function renderApiPurchasePanelLegacy() {
 function renderApiPurchasePanel() {
   if (!state.apiPurchaseOpen) return "";
   const product = apiProducts.find((item)=>item.code === state.apiPurchaseProduct);
-  const plans = [{points:200,amount:200,note:"适合首次接入和联调"},{points:800,amount:800,note:"适合个人开发者与小团队"},{points:2500,amount:2500,note:"适合高频业务调用"}];
-  const selected = plans.find((plan)=>plan.points === state.apiRechargeAmount) || plans[1];
-  return `<div class="api-purchase-mask" data-action="api-close-purchase"></div><aside class="api-purchase-panel"><header><div><span class="kicker">API BALANCE</span><h2>${product ? `开通 ${product.name}` : "充值 API 余额"}</h2><p>${product ? `${product.method} ${product.endpoint} · ${product.price===0?"免费接口":`每次成功调用 ¥${product.price}`}。接口本身与全球查完全一致。` : "充值后可调用全部 33 个全球查同源接口，按各接口原价逐次扣费。"}</p></div><button data-action="api-close-purchase" aria-label="关闭">×</button></header>${product?`<section class="api-selected-contract"><strong>本次开通接口</strong><div><code>${product.code}</code><span>${product.group}</span><b>${product.price===0?"免费":`¥${product.price} / 次`}</b></div></section>`:""}<section><strong>选择预存金额</strong><div class="api-plan-grid">${plans.map((plan)=>`<button class="${state.apiRechargeAmount===plan.points?"selected":""}" data-action="api-plan" data-points="${plan.points}"><b>充值 ¥${plan.points.toLocaleString()}</b><strong>到账 ¥${plan.amount}</strong><small>${plan.note}</small></button>`).join("")}</div></section><section><strong>支付方式</strong><div class="api-payment-grid">${[["WECHAT","微","微信支付（示例）"],["ALIPAY","支","支付宝（示例）"],["BANK_TRANSFER","企","对公转账（示例）"]].map(([code,mark,label])=>`<button class="${state.apiPaymentMethod===code?"selected":""}" data-action="api-payment" data-method="${code}"><i>${mark}</i><span>${label}</span>${state.apiPaymentMethod===code?icon("check",15):""}</button>`).join("")}</div></section><div class="api-purchase-summary"><div><span>当前 API 余额</span><strong>¥${state.apiBalance.toLocaleString()}</strong></div><div><span>充值后余额</span><strong>¥${(state.apiBalance+selected.amount).toLocaleString()}</strong></div><div><span>应付金额</span><strong>¥${selected.amount}</strong></div></div><footer><small>${icon("shield",14)} 当前为 Mock 示例，不会真实扣款；微信、支付宝、对公转账和开票待后期替换真实 Provider Adapter。</small><button data-action="confirm-api-purchase" ${state.apiPurchaseBusy?"disabled":""}>${state.apiPurchaseBusy?"正在创建订单…":"确认充值并开通"} ${icon("arrow",16)}</button></footer></aside>`;
+  const plans = [{amount:10,note:"低门槛体验"},{amount:50,note:"开发联调"},{amount:100,note:"个人常用"},{amount:500,note:"小团队使用"}];
+  const selectedAmount = Number(state.apiRechargeAmount);
+  const isPreset = plans.some((plan)=>plan.amount === selectedAmount);
+  const validAmount = Number.isFinite(selectedAmount) && selectedAmount >= 1 && selectedAmount <= 50000;
+  const amountText = validAmount ? selectedAmount.toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+  const afterBalance = validAmount ? (state.apiBalance + selectedAmount).toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+  return `<div class="api-purchase-mask" data-action="api-close-purchase"></div><aside class="api-purchase-panel"><header><div><span class="kicker">API BALANCE</span><h2>${product ? `开通 ${product.name}` : "充值 API 余额"}</h2><p>${product ? `${product.method} ${product.endpoint} · ${product.price===0?"免费接口":`每次成功调用 ¥${product.price}`}。接口本身与全球查完全一致。` : "充值后可调用全部 33 个全球查同源接口，按各接口原价逐次扣费。"}</p></div><button data-action="api-close-purchase" aria-label="关闭">×</button></header>${product?`<section class="api-selected-contract"><strong>本次开通接口</strong><div><code>${product.code}</code><span>${product.group}</span><b>${product.price===0?"免费":`¥${product.price} / 次`}</b></div></section>`:""}<section><div class="api-recharge-heading"><strong>选择充值金额</strong><span>充值多少，到账多少</span></div><div class="api-plan-grid flexible">${plans.map((plan)=>`<button class="${selectedAmount===plan.amount?"selected":""}" data-action="api-plan" data-points="${plan.amount}"><b>¥${plan.amount}</b><small>${plan.note}</small></button>`).join("")}</div><label class="api-custom-amount ${!isPreset&&validAmount?"selected":""}"><span>自定义金额</span><div><b>¥</b><input data-api-custom-amount type="number" min="1" max="50000" step="0.01" inputmode="decimal" value="${!isPreset&&validAmount?selectedAmount:""}" placeholder="最低 1 元" aria-label="自定义 API 充值金额"><em>1–50,000 元</em></div><small>支持按实际用量灵活充值，金额最多保留两位小数。</small></label></section><section><strong>支付方式</strong><div class="api-payment-grid">${[["WECHAT","微","微信支付（示例）"],["ALIPAY","支","支付宝（示例）"],["BANK_TRANSFER","企","对公转账（示例）"]].map(([code,mark,label])=>`<button class="${state.apiPaymentMethod===code?"selected":""}" data-action="api-payment" data-method="${code}"><i>${mark}</i><span>${label}</span>${state.apiPaymentMethod===code?icon("check",15):""}</button>`).join("")}</div></section><div class="api-purchase-summary"><div><span>当前 API 余额</span><strong>¥${state.apiBalance.toLocaleString()}</strong></div><div><span>充值后余额</span><strong data-api-after-balance>¥${afterBalance}</strong></div><div><span>应付金额</span><strong data-api-pay-amount>¥${amountText}</strong></div></div><footer><small>${icon("shield",14)} 当前为 Mock 示例，不会真实扣款；微信、支付宝、对公转账和开票待后期替换真实 Provider Adapter。</small><button data-action="confirm-api-purchase" ${state.apiPurchaseBusy||!validAmount?"disabled":""}>${state.apiPurchaseBusy?"正在创建订单…":"确认充值并开通"} ${icon("arrow",16)}</button></footer></aside>`;
 }
 
 function apiEndpointFor(product) {
@@ -1854,7 +1809,7 @@ function renderAdminProducts() {
 
 function renderAdminPricing() {
   const rows = modules.slice(0,8).map((module,index)=>[module.code,module.name,money(module.price),money(Math.max(19,module.price-10)),index<3?"组合优惠":"无自动优惠","生效中"]);
-  return adminShell(`${adminOpsHeader("PRICING & PROMOTION","价格与优惠","配置报告模块、全球查同源 API 单价、预存余额和组合优惠；所有变更保留审批与回滚。","创建价格版本","新价格版本已进入草稿，发布前需要审批（演示）")}${adminOpsMetrics([["当前价格版本","v1.6","2026-08-16 生效"],["在售报告 SKU","8","覆盖 4 个正式市场"],["全球查同源 API","33","按元/次原价计费"],["本月优惠成本","¥12,860","占成交额 6.4%"]])}<section class="ops-layout pricing-layout"><article class="ops-card active-version"><header><div><strong>当前生效版本</strong><span>PRICE-20260816-V16</span></div><em>已发布</em></header><h2>模块价 + API 原价同步</h2><p>报告购买 3 个及以上模块自动优惠 12%；API 接口单价与全球查保持一致，用户先充值独立 API 余额。</p><div><button data-action="admin-demo-action" data-message="已复制 v1.6 为新草稿">复制为草稿</button><button>查看审计记录</button></div></article><article class="ops-card point-packages"><header><div><strong>API 预存余额</strong><span>与前台充值页一致</span></div></header>${[["充值 ¥200","到账 ¥200"],["充值 ¥800","到账 ¥800"],["充值 ¥2,500","到账 ¥2,500"]].map(([points,price])=>`<div><span>${points}</span><strong>${price}</strong><button data-action="admin-demo-action" data-message="正在编辑 ${points} 档位">编辑</button></div>`).join("")}</article></section><section class="ops-table-card"><header><div><strong>报告模块价格</strong><span>标准价、会员价与优惠规则</span></div><div><button>批量调价</button><button>价格预览</button></div></header><div class="ops-table pricing"><div class="head"><span>模块</span><span>标准价</span><span>会员价</span><span>优惠</span><span>状态</span><span>操作</span></div>${rows.map((row)=>`<div><span><b>${row[0]}</b>${row[1]}</span><strong>${row[2]}</strong><span>${row[3]}</span><span>${row[4]}</span><em class="ok">${row[5]}</em><button data-action="admin-demo-action" data-message="已打开 ${row[0]} 调价面板">调价</button></div>`).join("")}</div></section>`, "admin-pricing");
+  return adminShell(`${adminOpsHeader("PRICING & PROMOTION","价格与优惠","配置报告模块、全球查同源 API 单价、预存余额和组合优惠；所有变更保留审批与回滚。","创建价格版本","新价格版本已进入草稿，发布前需要审批（演示）")}${adminOpsMetrics([["当前价格版本","v1.6","2026-08-16 生效"],["在售报告 SKU","8","覆盖 4 个正式市场"],["全球查同源 API","33","按元/次原价计费"],["本月优惠成本","¥12,860","占成交额 6.4%"]])}<section class="ops-layout pricing-layout"><article class="ops-card active-version"><header><div><strong>当前生效版本</strong><span>PRICE-20260816-V16</span></div><em>已发布</em></header><h2>模块价 + API 原价同步</h2><p>报告购买 3 个及以上模块自动优惠 12%；API 接口单价与全球查保持一致，用户先充值独立 API 余额。</p><div><button data-action="admin-demo-action" data-message="已复制 v1.6 为新草稿">复制为草稿</button><button>查看审计记录</button></div></article><article class="ops-card point-packages"><header><div><strong>API 充值规则</strong><span>与前台充值页一致</span></div></header>${[["快捷金额","¥10 / ¥50 / ¥100 / ¥500"],["自定义金额","¥1–¥50,000"],["到账规则","充值多少，到账多少"]].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong><button data-action="admin-demo-action" data-message="正在编辑 ${label}">编辑</button></div>`).join("")}</article></section><section class="ops-table-card"><header><div><strong>报告模块价格</strong><span>标准价、会员价与优惠规则</span></div><div><button>批量调价</button><button>价格预览</button></div></header><div class="ops-table pricing"><div class="head"><span>模块</span><span>标准价</span><span>会员价</span><span>优惠</span><span>状态</span><span>操作</span></div>${rows.map((row)=>`<div><span><b>${row[0]}</b>${row[1]}</span><strong>${row[2]}</strong><span>${row[3]}</span><span>${row[4]}</span><em class="ok">${row[5]}</em><button data-action="admin-demo-action" data-message="已打开 ${row[0]} 调价面板">调价</button></div>`).join("")}</div></section>`, "admin-pricing");
 }
 
 function renderAdminProviders() {
@@ -2194,7 +2149,7 @@ function resetDemo() {
   state.apiBalance = 8420;
   state.apiPurchaseOpen = false;
   state.apiPurchaseProduct = null;
-  state.apiRechargeAmount = 800;
+  state.apiRechargeAmount = 50;
   state.apiPaymentMethod = "WECHAT";
   state.apiPurchaseBusy = false;
   state.apiLastPurchase = null;
@@ -2513,7 +2468,7 @@ async function handleClick(event) {
     renderPreservingScroll();
   }
   else if (action === "api-close-purchase") { state.apiPurchaseOpen = false; renderPreservingScroll(); }
-  else if (action === "api-plan") { state.apiRechargeAmount = Number(target.dataset.points) || 800; renderPreservingScroll(); }
+  else if (action === "api-plan") { state.apiRechargeAmount = Number(target.dataset.points) || 50; renderPreservingScroll(); }
   else if (action === "api-payment") { state.apiPaymentMethod = target.dataset.method || "WECHAT"; renderPreservingScroll(); }
   else if (action === "api-free-trial") {
     if (!state.loggedIn) { state.returnAfterLogin = "api-market"; return go("login"); }
@@ -2527,11 +2482,12 @@ async function handleClick(event) {
       go("login");
       return toast("请先登录，API 预存金额和支付方式已为你保留");
     }
-    const amounts = {200:200,800:800,2500:2500};
+    const amount = Number(state.apiRechargeAmount);
+    if (!Number.isFinite(amount) || amount < 1 || amount > 50000 || Math.round(amount * 100) !== amount * 100) return toast("请输入 1–50,000 元之间的充值金额，最多保留两位小数");
     state.apiPurchaseBusy = true;
     renderPreservingScroll();
     try {
-      const payload = await callMockApi("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:state.customer?.id || "CUS-DEMO-0001", amount:amounts[state.apiRechargeAmount], method:state.apiPaymentMethod, apiCode:state.apiPurchaseProduct }) });
+      const payload = await callMockApi("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:state.customer?.id || "CUS-DEMO-0001", amount, method:state.apiPaymentMethod, apiCode:state.apiPurchaseProduct }) });
       state.apiBalance = payload.data.balance;
       state.apiLastPurchase = payload.data;
       state.apiPurchaseOpen = false;
@@ -2771,12 +2727,6 @@ function render() {
   apiDetailScrollCleanup?.();
   apiDetailScrollCleanup = null;
   const current = route().name;
-  persistSessionState();
-  if (lastRenderedRoute && current !== lastRenderedRoute && current.startsWith("admin")) {
-    state.adminDrawer = null;
-    state.adminWorkflowModal = null;
-  }
-  lastRenderedRoute = current;
   const protectedRoutes = new Set(["account","api-console","api-keys","api-usage"]);
   const isAdminRoute = current.startsWith("admin-") || current === "admin";
   if (current === "files") { go("home"); return; }
@@ -2887,10 +2837,6 @@ function render() {
   if (current === "admin-api-customers" && (state.adminSubtabByRoute[current] || "overview") === "overview") {
     markup = markup.replace('<section class="ops-table-card">', `${renderAdminDeveloperMatrix()}<section class="ops-table-card">`);
   }
-  markup = markup.replaceAll(
-    "http://127.0.0.1:4190",
-    window.SQJ_RUNTIME?.publicApiBase || mockApi.baseUrl,
-  );
   markup = localizeMarkup(markup);
   app.innerHTML = markup
     .replaceAll("SQJ-TASK-20260816-008", state.mockTask?.taskId || "SQJ-TASK-DEMO-008")
@@ -2910,6 +2856,25 @@ function render() {
 document.addEventListener("click", handleClick);
 document.addEventListener("submit", handleSubmit);
 document.addEventListener("input", (event) => {
+  if (event.target.matches("[data-api-custom-amount]")) {
+    const amount = Number(event.target.value);
+    state.apiRechargeAmount = amount;
+    const valid = Number.isFinite(amount) && amount >= 1 && amount <= 50000 && Math.round(amount * 100) === amount * 100;
+    event.target.closest(".api-custom-amount")?.classList.toggle("selected", valid);
+    const panel = event.target.closest(".api-purchase-panel");
+    const amountText = valid ? amount.toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+    const afterText = valid ? (state.apiBalance + amount).toLocaleString("zh-CN", { maximumFractionDigits:2 }) : "--";
+    if (panel) {
+      panel.querySelectorAll(".api-plan-grid button").forEach((button)=>button.classList.remove("selected"));
+      const payAmount = panel.querySelector("[data-api-pay-amount]");
+      const afterBalance = panel.querySelector("[data-api-after-balance]");
+      const confirm = panel.querySelector('[data-action="confirm-api-purchase"]');
+      if (payAmount) payAmount.textContent = `¥${amountText}`;
+      if (afterBalance) afterBalance.textContent = `¥${afterText}`;
+      if (confirm) confirm.disabled = !valid;
+    }
+    return;
+  }
   const field = event.target.dataset.invoiceField;
   if (field && Object.hasOwn(state.invoiceProfile, field)) state.invoiceProfile[field] = event.target.value;
 });

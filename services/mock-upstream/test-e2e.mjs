@@ -77,12 +77,12 @@ try {
   assert(apiCatalog.response.status === 200 && apiCatalog.payload.data.items.length === 33, "API 市场返回全球查同源的 33 个接口");
   assert(apiCatalog.payload.data.items.every((item) => item.price >= 0 && item.priceUnit === "元/次" && item.compatibility.includes("API")), "每个接口都保留全球查单价与 API 兼容性");
   const apiProductDetail = await request("/open/v1/api-products/companiesProfile");
-  assert(apiProductDetail.response.status === 200 && apiProductDetail.payload.data.endpoint === "/api/v1/companies/profile" && apiProductDetail.payload.data.price === 0.10 && apiProductDetail.payload.data.commonFields.includes("isCost"), "API 详情返回全球查同源路径、按次调用价与通用计费字段");
-  const apiBalanceOrder = await request("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:smsSession.payload.data.customer.id, amount:800, method:"WECHAT", apiCode:"companiesProfile" }) });
+  assert(apiProductDetail.response.status === 200 && apiProductDetail.payload.data.endpoint === "/api/v1/companies/profile" && apiProductDetail.payload.data.price === 0.1 && apiProductDetail.payload.data.commonFields.includes("isCost"), "API 详情返回全球查同源路径、人民币调用单价与通用计费字段");
+  const apiBalanceOrder = await request("/open/v1/api-balance-orders", { method:"POST", body:JSON.stringify({ customerId:smsSession.payload.data.customer.id, amount:50, method:"WECHAT", apiCode:"companiesProfile" }) });
   assert(apiBalanceOrder.response.status === 201 && apiBalanceOrder.payload.data.status === "PAID", "登录客户可通过微信充值 API 人民币预存余额");
-  assert(apiBalanceOrder.payload.data.balance === 9220 && apiBalanceOrder.payload.data.currency === "CNY", "API 人民币余额充值后立即到账");
+  assert(apiBalanceOrder.payload.data.balance === 8470 && apiBalanceOrder.payload.data.currency === "CNY", "API 人民币余额充值后立即到账");
   const apiWallet = await request(`/open/v1/customers/${smsSession.payload.data.customer.id}/api-wallet`);
-  assert(apiWallet.response.status === 200 && apiWallet.payload.data.balance === 9220 && apiWallet.payload.data.unit === "YUAN" && apiWallet.payload.data.recentOrders.length === 1, "开发者 API 钱包统一使用人民币余额与充值记录");
+  assert(apiWallet.response.status === 200 && apiWallet.payload.data.balance === 8470 && apiWallet.payload.data.unit === "YUAN" && apiWallet.payload.data.recentOrders.length === 1, "开发者 API 钱包统一使用人民币余额与充值记录");
 
   const wallet = await request(`/open/v1/customers/${smsSession.payload.data.customer.id}/wallet`);
   assert(wallet.response.status === 200 && wallet.payload.data.balance === 568, "个人中心可查询账户余额");
