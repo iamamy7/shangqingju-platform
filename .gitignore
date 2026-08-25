@@ -1,7 +1,5 @@
 node_modules
 .nuxt
-.output
-dist
 coverage
 runtime-data
 .env
@@ -11,4 +9,3 @@ runtime-data
 .DS_Store
 .idea/
 /tmp/
-/output/
