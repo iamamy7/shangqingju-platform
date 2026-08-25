@@ -1,0 +1,12 @@
+{
+  "M01": {"name": "企业基础与注册", "defaultState": "AVAILABLE", "price": 9.9},
+  "M02": {"name": "联系方式与运营信息", "defaultState": "AVAILABLE", "price": 6.9},
+  "M03": {"name": "股东与控制权", "defaultState": "AVAILABLE", "price": 19.9},
+  "M04": {"name": "董事与管理层", "defaultState": "AVAILABLE", "price": 12.9},
+  "M05": {"name": "集团与关联企业", "defaultState": "AVAILABLE", "price": 16.9},
+  "M06": {"name": "财务与经营表现", "defaultState": "PARTIAL", "price": 24.9},
+  "M07": {"name": "司法与经营风险", "defaultState": "AVAILABLE", "price": 18.9},
+  "M08": {"name": "制裁与合规", "defaultState": "NO_RECORD", "price": 14.9},
+  "M09": {"name": "上市、融资与并购", "defaultState": "NO_RECORD", "price": 12.9},
+  "M10": {"name": "知识产权与网络风险", "defaultState": "NO_COVERAGE", "price": 15.9}
+}

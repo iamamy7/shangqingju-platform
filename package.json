@@ -1,0 +1,22 @@
+{
+  "name": "shangqingju-platform",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' --filter './services/*' dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "generate:report-pdf": "python3 scripts/generate-demo-report-pdf.py",
+    "import:prototype-catalog": "node scripts/import-prototype-catalog.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vue-tsc": "^3.0.6"
+  }
+}

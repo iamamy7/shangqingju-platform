@@ -1,0 +1,429 @@
+openapi: 3.1.0
+info:
+  title: 商情局 Mock Upstream API
+  version: 1.0.0
+  description: |
+    面向联调与验收的合成数据 API。返回数据不代表真实企业、价格或上游能力。
+    对下游契约保持稳定，真实上游到位后由 real-adapter 转换。
+servers:
+  - url: http://127.0.0.1:4190
+    description: 本地 Mock
+security:
+  - ApiKey: []
+paths:
+  /health:
+    get:
+      security: []
+      summary: 健康检查
+      responses:
+        "200": { description: 服务正常 }
+  /open/v1/mock/scenarios:
+    get:
+      summary: 可强制的 Mock 场景清单
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+  /open/v1/markets:
+    get:
+      summary: 国家、模块与 Mock 可用性
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+  /open/v1/insights:
+    get:
+      summary: 每日一级市场与二级市场深度资讯
+      description: 返回商情局每日刊、六个线索源、五个内容子模块及带独立分析正文的文章列表；原始来源仅用于事实核验。
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+  /open/v1/insights/{insightId}:
+    get:
+      summary: 获取商情局原创深度文章
+      parameters:
+        - name: insightId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/admin/insight-agent:
+    get:
+      summary: 获取每日资讯 Agent 状态与发布队列
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+  /open/v1/admin/insight-agent/runs:
+    post:
+      summary: 启动一次资讯采集、写作与审核批次
+      responses:
+        "202": { $ref: "#/components/responses/Envelope" }
+  /open/v1/auth/sms-codes:
+    post:
+      summary: 发送手机号登录验证码
+      description: Mock 环境固定返回演示验证码 123456。
+      responses:
+        "202": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/auth/sessions:
+    post:
+      summary: 通过手机号验证码或微信扫码创建客户会话
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "401": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/api-products:
+    get:
+      summary: 获取全球查同源的 33 个 API 接口目录
+      description: 返回与全球查一致的 OperationId、请求方式、接口路径、分类与元/次单价。
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+  /open/v1/api-products/{code}:
+    get:
+      summary: 获取单个 API 商品及文档元数据
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string, example: companiesProfile }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/api-balance-orders:
+    post:
+      summary: 充值 API 预存余额
+      description: Mock / 示例接口。登录客户可选微信、支付宝或对公转账生成演示充值记录；当前不会真实扣款，后期替换支付 Provider Adapter。接口调用按全球查原价扣减人民币余额。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, amount, method]
+              properties:
+                customerId: { type: string, example: CUS-DEMO-0001 }
+                amount: { type: number, example: 800 }
+                method: { type: string, enum: [WECHAT, ALIPAY, BANK_TRANSFER] }
+                apiCode: { type: string, example: companiesProfile }
+      responses:
+        "201": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/customers/{customerId}/api-wallet:
+    get:
+      summary: 查询 API 人民币余额与充值记录
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/customers/{customerId}/wallet:
+    get:
+      summary: 查询客户账户余额与充值方式
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/customers/{customerId}/wallet/recharges:
+    post:
+      summary: 模拟账户余额充值
+      description: 支持微信、支付宝与对公转账；仅生成 Mock 充值记录，不会真实扣款。
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, method]
+              properties:
+                amount: { type: number, minimum: 1, maximum: 10000, example: 300 }
+                method: { type: string, enum: [WECHAT, ALIPAY, BANK_TRANSFER] }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/orders:
+    post:
+      summary: 创建待支付订单
+      description: 客户登录后创建订单；保存用户、调查主体、模块、金额与开票状态。
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, companyId, modules, amount]
+              properties:
+                customerId: { type: string, example: CUS-DEMO-0001 }
+                companyId: { type: string, example: SQJ-DEMO-US-0001 }
+                modules: { type: array, items: { type: string }, example: [M01, M03, M08] }
+                amount: { type: number, example: 200 }
+                invoiceRequested: { type: boolean, default: false }
+                invoiceType: { type: string, enum: [VAT_ORDINARY, VAT_SPECIAL], default: VAT_ORDINARY }
+                invoice:
+                  type: object
+                  properties:
+                    title: { type: string, example: 商情局演示科技有限公司 }
+                    taxId: { type: string, example: 91310000DEMO202608 }
+                    registeredAddress: { type: string, example: 上海市浦东新区演示路 88 号 }
+                    registeredPhone: { type: string, example: 021-60000000 }
+                    bankName: { type: string, example: 中国工商银行上海演示支行 }
+                    bankAccount: { type: string, example: "100100000000000001" }
+                    email: { type: string, format: email, example: invoice@example.com }
+      responses:
+        "201": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+        "422": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/invoice-applications:
+    post:
+      summary: 提交开票申请
+      description: Mock / 示例接口。收银台支付后或个人中心均调用此契约；多个 orderId 表示合并开票。专票需提交完整六项购买方资料及接收邮箱。当前只生成演示开票申请，后期替换发票 Provider Adapter。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, orderIds, invoiceType, invoice]
+              properties:
+                customerId: { type: string, example: CUS-DEMO-0001 }
+                orderIds: { type: array, minItems: 1, items: { type: string }, example: [SQJ-ORD-DEMO-2408, SQJ-ORD-DEMO-2381] }
+                amount: { type: number, example: 440 }
+                invoiceType: { type: string, enum: [VAT_ORDINARY, VAT_SPECIAL] }
+                source: { type: string, enum: [CHECKOUT, ACCOUNT_CENTER] }
+                invoice:
+                  type: object
+                  properties:
+                    title: { type: string }
+                    taxId: { type: string }
+                    registeredAddress: { type: string }
+                    registeredPhone: { type: string }
+                    bankName: { type: string }
+                    bankAccount: { type: string }
+                    email: { type: string, format: email }
+      responses:
+        "201": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+        "409": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/orders/{orderId}:
+    get:
+      summary: 查询订单、支付与开票状态
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/orders/{orderId}/payments:
+    post:
+      summary: 模拟订单支付
+      description: 支持 WECHAT、ALIPAY、BALANCE 与 BANK_TRANSFER；仅生成 Mock 支付记录，不会真实扣款。
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method]
+              properties:
+                method: { type: string, enum: [WECHAT, ALIPAY, BALANCE, BANK_TRANSFER] }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+        "409": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/global/companies/search:
+    get:
+      summary: A01 全球数据库主体搜索
+      description: 仅路由到全球企业数据库 Provider，不访问国内数据库。
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string }, example: Northstar }
+        - { name: country, in: query, required: false, schema: { type: string, minLength: 2, maxLength: 2 }, example: US }
+        - { $ref: "#/components/parameters/MockScenario" }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/domestic/companies/search:
+    get:
+      summary: A01 国内数据库主体搜索
+      description: 仅路由到中国大陆企业数据库 Provider，不访问全球数据库。
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string }, example: 上海青岚科技 }
+        - { $ref: "#/components/parameters/MockScenario" }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/companies/search:
+    get:
+      summary: A01 全球主体搜索与消歧（兼容旧路径）
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string }, example: Northstar }
+        - { name: country, in: query, required: false, schema: { type: string, minLength: 2, maxLength: 2 }, example: US }
+        - { $ref: "#/components/parameters/MockScenario" }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "400": { $ref: "#/components/responses/ErrorEnvelope" }
+        "503": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/companies/{companyId}/basic:
+    get:
+      summary: A02 M01 企业基础与注册
+      parameters:
+        - { $ref: "#/components/parameters/CompanyId" }
+        - { $ref: "#/components/parameters/MockScenario" }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/companies/{companyId}/modules/{moduleCode}:
+    get:
+      summary: A02 企业模块数据
+      parameters:
+        - { $ref: "#/components/parameters/CompanyId" }
+        - name: moduleCode
+          in: path
+          required: true
+          schema: { type: string, enum: [M01, M02, M03, M04, M05, M06, M07, M08, M09, M10] }
+        - { $ref: "#/components/parameters/MockScenario" }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "422": { $ref: "#/components/responses/ErrorEnvelope" }
+        "503": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/report-tasks:
+    post:
+      summary: A03 创建报告任务
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [companyId, modules]
+              properties:
+                companyId: { type: string, example: SQJ-DEMO-US-0001 }
+                modules:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items: { type: string, pattern: "^M\\d{2}$" }
+                  example: [M01, M03, M08]
+      responses:
+        "202": { $ref: "#/components/responses/Envelope" }
+        "422": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/report-tasks/{taskId}:
+    get:
+      summary: A03 查询报告任务进度
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/reports/{reportId}:
+    get:
+      summary: 取得结构化报告
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+  /open/v1/reports/{reportId}/questions:
+    post:
+      summary: 仅基于报告内容的 Mock AI 问答
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string, example: 是否命中制裁名单？ }
+      responses:
+        "200": { $ref: "#/components/responses/Envelope" }
+        "404": { $ref: "#/components/responses/ErrorEnvelope" }
+components:
+  securitySchemes:
+    ApiKey: { type: apiKey, in: header, name: X-API-Key, description: 商情局对客统一鉴权凭证，仅通过 HTTPS 请求头传输；上游凭证由服务端 Provider Adapter 管理。 }
+  parameters:
+    CompanyId:
+      name: companyId
+      in: path
+      required: true
+      schema: { type: string }
+      example: SQJ-DEMO-US-0001
+    MockScenario:
+      name: X-Mock-Scenario
+      in: header
+      required: false
+      schema:
+        type: string
+        enum: [default, no-record, partial, ambiguous, no-coverage, provider-error, slow]
+  schemas:
+    DataState:
+      type: string
+      enum: [AVAILABLE, NO_RECORD, PARTIAL, NO_COVERAGE, AMBIGUOUS, PROVIDER_ERROR, SYSTEM_ERROR]
+    Envelope:
+      type: object
+      required: [requestId, traceId, dataState, queryAt, cacheHit, billable, provider, data]
+      properties:
+        requestId: { type: string }
+        traceId: { type: string }
+        dataState: { $ref: "#/components/schemas/DataState" }
+        queryAt: { type: string, format: date-time }
+        sourceUpdatedAt: { type: string, format: date-time }
+        cacheHit: { type: boolean }
+        billable: { type: boolean }
+        provider:
+          type: object
+          properties:
+            mode: { type: string, enum: [MOCK, REAL] }
+            code: { type: string }
+        data: {}
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+  responses:
+    Envelope:
+      description: 统一响应
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Envelope" }
+    ErrorEnvelope:
+      description: 统一错误响应
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Envelope" }

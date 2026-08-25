@@ -1,0 +1,1423 @@
+[
+  {
+    "apiId": "GC-API-001",
+    "serial": 1,
+    "operationId": "personsShareholdingCompanies",
+    "category": "自然人主体信息",
+    "nameZh": "自然人参股公司查询",
+    "nameEn": "personsShareholdingCompanies",
+    "description": "根据 PID 查询个人直接和间接参股的公司。",
+    "method": "POST",
+    "path": "/api/v1/persons/shareholding-companies",
+    "tags": [
+      "直接参股",
+      "间接参股"
+    ],
+    "request": [
+      [
+        "pid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeHistorical",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "maxLevel",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 56,
+    "unitPrice": "0.10",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-002",
+    "serial": 2,
+    "operationId": "personsManagementCompanies",
+    "category": "自然人主体信息",
+    "nameZh": "自然人任职公司查询",
+    "nameEn": "personsManagementCompanies",
+    "description": "根据 PID 查询该个人现任或历史董事、高管、经理、授权签字人等任职公司。",
+    "method": "POST",
+    "path": "/api/v1/persons/management-companies",
+    "tags": [
+      "任职公司",
+      "董事",
+      "高管",
+      "授权签字人"
+    ],
+    "request": [
+      [
+        "pid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeHistorical",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 55,
+    "unitPrice": "0.10",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-003",
+    "serial": 3,
+    "operationId": "personsIdentityResolve",
+    "category": "自然人主体信息",
+    "nameZh": "自然人身份识别",
+    "nameEn": "personsIdentityResolve",
+    "description": "先按公司名搜索前 10 个企业候选，再按姓名和可选性别查询并合并相关人员和企业关系。",
+    "method": "POST",
+    "path": "/api/v1/persons/identity/resolve",
+    "tags": [
+      "身份识别",
+      "企业关联"
+    ],
+    "request": [
+      [
+        "companyName",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "personName",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "gender",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 27,
+    "unitPrice": "0.05",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-004",
+    "serial": 4,
+    "operationId": "companiesPrincipals",
+    "category": "自然人主体信息",
+    "nameZh": "企业董监高与管理人员查询",
+    "nameEn": "companiesPrincipals",
+    "description": "根据企业 EID 获取董事及高管关系，按 PID 合并同一人员的多个任职角色。",
+    "method": "POST",
+    "path": "/api/v1/companies/principals",
+    "tags": [
+      "董事",
+      "高管",
+      "任职角色"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "currentOnly",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "purpose",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 25,
+    "unitPrice": "0.10",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-005",
+    "serial": 5,
+    "operationId": "companiesWebContactsDetail",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业公开联系方式与触点",
+    "nameEn": "companiesWebContactsDetail",
+    "description": "通过 LLM 实时搜索企业公开联系方式、官方域名、社媒、职能邮箱、邮箱模式和公开职业触点。",
+    "method": "POST",
+    "path": "/api/v1/companies/web-contacts/detail",
+    "tags": [
+      "联系方式",
+      "官方域名",
+      "社媒",
+      "职能邮箱"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "website",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 36,
+    "unitPrice": "0.20",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-006",
+    "serial": 6,
+    "operationId": "queryM4Data",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业上市信息与GIIN代码查询M4",
+    "nameEn": "queryM4Data",
+    "description": "获取企业在全球交易所的上市信息、股票代码、ISIN及GIIN代码。",
+    "method": "GET",
+    "path": "/glov2/modules/M4/data",
+    "tags": [
+      "上市信息",
+      "股票代码",
+      "上市状态"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-007",
+    "serial": 7,
+    "operationId": "companiesSearchResolve",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业搜索识别",
+    "nameEn": "companiesSearchResolve",
+    "description": "按企业名称或注册号搜索并返回去重名称和规范化匹配分数的企业候选。",
+    "method": "POST",
+    "path": "/api/v1/companies/search/resolve",
+    "tags": [
+      "企业搜索",
+      "名称解析",
+      "匹配分数"
+    ],
+    "request": [
+      [
+        "name",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "countryIso2",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "registrationNumber",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeBranch",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeInactive",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "searchType",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 22,
+    "unitPrice": "0.05",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-008",
+    "serial": 8,
+    "operationId": "companiesProfile",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业基础档案查询",
+    "nameEn": "companiesProfile",
+    "description": "获取去重后的企业基础档案、法律状态、业务概览、行业和识别编号。",
+    "method": "POST",
+    "path": "/api/v1/companies/profile",
+    "tags": [
+      "基础档案",
+      "法律状态",
+      "业务概览",
+      "行业分类",
+      "识别编号"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 82,
+    "unitPrice": "0.10",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-009",
+    "serial": 9,
+    "operationId": "companiesProfileFull",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业完整档案查询",
+    "nameEn": "companiesProfileFull",
+    "description": "按 EID 输出去重、分模块且字段契约完整的公司画像。",
+    "method": "POST",
+    "path": "/api/v1/companies/profile/full",
+    "tags": [
+      "完整画像",
+      "多模块聚合"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 620,
+    "unitPrice": "1.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-010",
+    "serial": 10,
+    "operationId": "companiesIdentifiers",
+    "category": "主体识别与基础信息",
+    "nameZh": "企业识别编号查询",
+    "nameEn": "companiesIdentifiers",
+    "description": "获取企业注册号、VAT、LEI、ISIN、贸易登记号、CAGE、UEI 等识别编号。",
+    "method": "POST",
+    "path": "/api/v1/companies/identifiers",
+    "tags": [
+      "企业识别编号",
+      "VAT编号",
+      "贸易登记号"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 55,
+    "unitPrice": "0.05",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-011",
+    "serial": 11,
+    "operationId": "queryM2Data",
+    "category": "主体识别与基础信息",
+    "nameZh": "全球实体分布查询M2",
+    "nameEn": "queryM2Data",
+    "description": "获取企业总部、子公司及分支机构在全球的分布情况。",
+    "method": "GET",
+    "path": "/glov2/modules/M2/data",
+    "tags": [
+      "总部",
+      "子公司",
+      "分支机构",
+      "全球分布"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-012",
+    "serial": 12,
+    "operationId": "queryM1Data",
+    "category": "主体识别与基础信息",
+    "nameZh": "基本信息查询M1",
+    "nameEn": "queryM1Data",
+    "description": "可查询企业基本信息、法律状态、工商信息、企业概览、行业和识别编号等。",
+    "method": "GET",
+    "path": "/glov2/modules/M1/data",
+    "tags": [
+      "基本信息",
+      "法律状态",
+      "企业概览",
+      "行业分类",
+      "识别编号"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.00",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-013",
+    "serial": 13,
+    "operationId": "companiesOwnershipStructure",
+    "category": "股权、组织架构与控制权",
+    "nameZh": "企业股权结构查询",
+    "nameEn": "companiesOwnershipStructure",
+    "description": "输出去重后的完整股权结构，包括股东路径、GUO、DUO、BO 和汇总统计。",
+    "method": "POST",
+    "path": "/api/v1/companies/ownership/structure",
+    "tags": [
+      "股东结构",
+      "GUO",
+      "DUO",
+      "BO",
+      "汇总统计"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeShareholders",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeGuo",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeDuo",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeBo",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeHistorical",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "maxLevel",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "purpose",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 56,
+    "unitPrice": "0.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-014",
+    "serial": 14,
+    "operationId": "companiesOwnershipInsight",
+    "category": "股权、组织架构与控制权",
+    "nameZh": "企业股权洞察查询",
+    "nameEn": "companiesOwnershipInsight",
+    "description": "获取企业一级股东和受益所有人快照，不递归展开股权链。",
+    "method": "POST",
+    "path": "/api/v1/companies/ownership/insight",
+    "tags": [
+      "一级股东",
+      "受益所有人"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeHistorical",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "shareholderLimit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "beneficialOwnerLimit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 56,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-015",
+    "serial": 15,
+    "operationId": "companiesLinkage",
+    "category": "股权、组织架构与控制权",
+    "nameZh": "企业关联关系查询",
+    "nameEn": "companiesLinkage",
+    "description": "获取企业总部、分支、子公司及集团成员关系。",
+    "method": "POST",
+    "path": "/api/v1/companies/linkage",
+    "tags": [
+      "总部",
+      "分支",
+      "子公司",
+      "集团成员"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeBranch",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeSubsidiaries",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeGroup",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "currentOnly",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "maxLevel",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "branchLimit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "subsidiaryLimit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "groupLimit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 104,
+    "unitPrice": "0.20",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-016",
+    "serial": 16,
+    "operationId": "queryM5Data",
+    "category": "股权、组织架构与控制权",
+    "nameZh": "公司组织架构概览查询M5",
+    "nameEn": "queryM5Data",
+    "description": "获取企业管理人个人信息、角色、高管教育程度等。",
+    "method": "GET",
+    "path": "/glov2/modules/M5/data",
+    "tags": [
+      "管理人信息",
+      "高管学历",
+      "雇员规模"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-017",
+    "serial": 17,
+    "operationId": "queryM3Data",
+    "category": "股权、组织架构与控制权",
+    "nameZh": "最终所有权与控制结构查询M3",
+    "nameEn": "queryM3Data",
+    "description": "获取企业股东信息、全球及国内实际控制人、最终受益人。",
+    "method": "GET",
+    "path": "/glov2/modules/M3/data",
+    "tags": [
+      "股东",
+      "实际控制人",
+      "最终受益人"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-018",
+    "serial": 18,
+    "operationId": "companiesLegalComplianceDetail",
+    "category": "司法、合规与负面风险",
+    "nameZh": "企业司法合规明细",
+    "nameEn": "companiesLegalComplianceDetail",
+    "description": "通过 LLM 搜索并结构化最近 24 个月的企业司法案件、监管处罚和已确认合规违规标签。",
+    "method": "POST",
+    "path": "/api/v1/companies/legal-compliance/detail",
+    "tags": [
+      "司法案件",
+      "监管处罚",
+      "合规标签"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 108,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-019",
+    "serial": 19,
+    "operationId": "companiesNegativeSignalsDetail",
+    "category": "司法、合规与负面风险",
+    "nameZh": "企业负面信号明细",
+    "nameEn": "companiesNegativeSignalsDetail",
+    "description": "检索最近 24 个月的企业负面舆情、高管争议、财务困境、付款投诉、劳资供应链争议及重大控制权或领导层风险信号。",
+    "method": "POST",
+    "path": "/api/v1/companies/negative-signals/detail",
+    "tags": [
+      "负面舆情",
+      "高管争议",
+      "财务困境",
+      "控制权风险"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 65,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-020",
+    "serial": 20,
+    "operationId": "companiesLegalEvents",
+    "category": "司法、合规与负面风险",
+    "nameZh": "企业法律事件查询",
+    "nameEn": "companiesLegalEvents",
+    "description": "获取数据库中的法律状态、注册事件、名称变更和专利诉讼。",
+    "method": "POST",
+    "path": "/api/v1/companies/legal-events",
+    "tags": [
+      "法律状态",
+      "注册事件",
+      "名称变更",
+      "专利诉讼"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "eventTypes",
+        "Array<string>",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateFrom",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateTo",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "purpose",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 69,
+    "unitPrice": "0.20",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-021",
+    "serial": 21,
+    "operationId": "companiesIpInnovation",
+    "category": "知识产权与科创资产",
+    "nameZh": "企业知识产权创新查询",
+    "nameEn": "companiesIpInnovation",
+    "description": "获取企业商标统计、两种专利统计口径、年度创新指标、专利清单、交易和美元估值。",
+    "method": "POST",
+    "path": "/api/v1/companies/ip-innovation",
+    "tags": [
+      "商标",
+      "专利",
+      "创新指标",
+      "专利交易",
+      "专利估值"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "years",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includePatentList",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 115,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-022",
+    "serial": 22,
+    "operationId": "queryM10Data",
+    "category": "知识产权与科创资产",
+    "nameZh": "专利价值-交易-诉讼概要查询M10",
+    "nameEn": "queryM10Data",
+    "description": "获取企业专利数量、创新价值、专利转移、专利诉讼等知识产权数据。",
+    "method": "GET",
+    "path": "/glov2/modules/M10/data",
+    "tags": [
+      "专利信息",
+      "专利数量",
+      "专利转移",
+      "专利诉讼",
+      "专利申请人",
+      "知识产权"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.80",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-023",
+    "serial": 23,
+    "operationId": "companiesRealtimeOperations",
+    "category": "经营表现与财务运营",
+    "nameZh": "企业实时经营信号",
+    "nameEn": "companiesRealtimeOperations",
+    "description": "通过 LLM 实时搜索生成按模块分组、去除静态说明与空占位的企业互联网经营画像。",
+    "method": "POST",
+    "path": "/api/v1/companies/realtime-operations",
+    "tags": [
+      "实时经营画像",
+      "互联网信号"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "website",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 32,
+    "unitPrice": "0.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-024",
+    "serial": 24,
+    "operationId": "companiesFinancials",
+    "category": "经营表现与财务运营",
+    "nameZh": "企业财务数据查询",
+    "nameEn": "companiesFinancials",
+    "description": "获取最近财年的核心财务、利润表和资产负债表原始数据。",
+    "method": "POST",
+    "path": "/api/v1/companies/financials",
+    "tags": [
+      "核心财务",
+      "利润表",
+      "资产负债表"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "years",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 57,
+    "unitPrice": "0.30",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-025",
+    "serial": 25,
+    "operationId": "companiesEventsTimeline",
+    "category": "经营表现与财务运营",
+    "nameZh": "企业事件时间线",
+    "nameEn": "companiesEventsTimeline",
+    "description": "按业务日期聚合并去重企业注册、状态、名称、工商、处罚、制裁、并购、诉讼、股权及管理层变化。",
+    "method": "POST",
+    "path": "/api/v1/companies/events/timeline",
+    "tags": [
+      "企业变更",
+      "并购重组",
+      "人员变动"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "eventTypes",
+        "Array<string>",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateFrom",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateTo",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 26,
+    "unitPrice": "0.20",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-026",
+    "serial": 26,
+    "operationId": "companiesInvestmentMap",
+    "category": "经营表现与财务运营",
+    "nameZh": "企业投资地图",
+    "nameEn": "companiesInvestmentMap",
+    "description": "企业投资地图，展示企业对外投资、参股、控股、层级、国家地区分布和相关并购交易。",
+    "method": "POST",
+    "path": "/api/v1/companies/investment-map",
+    "tags": [
+      "对外投资",
+      "股权层级",
+      "并购交易"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeDirect",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "includeIndirect",
+        "boolean",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "maxLevel",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 75,
+    "unitPrice": "0.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-027",
+    "serial": 27,
+    "operationId": "queryM7Data",
+    "category": "经营表现与财务运营",
+    "nameZh": "运营状况与财务详情查询M7",
+    "nameEn": "queryM7Data",
+    "description": "获取企业关键财务数据、资产负债表、经营活动等运营财务状况。",
+    "method": "GET",
+    "path": "/glov2/modules/M7/data",
+    "tags": [
+      "关键财务",
+      "资产负债表",
+      "损益表",
+      "业务条线",
+      "区域数据"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.80",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-028",
+    "serial": 28,
+    "operationId": "companiesTenderProcurement",
+    "category": "经营表现与财务运营",
+    "nameZh": "企业招投标与采购记录",
+    "nameEn": "companiesTenderProcurement",
+    "description": "根据企业 EID 双向查询已确认中标和政府合同中的采购方与供应商。",
+    "method": "POST",
+    "path": "/api/v1/companies/tender-procurement",
+    "tags": [
+      "招投标",
+      "政府采购",
+      "中标记录",
+      "供应商"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateFrom",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "dateTo",
+        "string",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "countryIso2s",
+        "Array<string>",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "contractTypes",
+        "Array<string>",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "procedureTypes",
+        "Array<string>",
+        "否",
+        "-",
+        "body"
+      ],
+      [
+        "limit",
+        "integer(int32)",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 92,
+    "unitPrice": "0.20",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-029",
+    "serial": 29,
+    "operationId": "queryM6Data",
+    "category": "国际合规与制裁筛查",
+    "nameZh": "制裁与相关法律风险详情查询M6",
+    "nameEn": "queryM6Data",
+    "description": "获取企业制裁信息、法律事件、违约风险及判决风险等法律风险详情。",
+    "method": "GET",
+    "path": "/glov2/modules/M6/data",
+    "tags": [
+      "制裁详情",
+      "法律事件",
+      "违约风险",
+      "判决风险"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.80",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-030",
+    "serial": 30,
+    "operationId": "companiesSanctionsDetail",
+    "category": "国际合规与制裁筛查",
+    "nameZh": "企业制裁与PEP明细",
+    "nameEn": "companiesSanctionsDetail",
+    "description": "对企业及其关键股东、UBO、控制人、董事和高管进行公开信息制裁、出口管制、PEP、RCA、SIP及所有权延伸筛查。",
+    "method": "POST",
+    "path": "/api/v1/companies/sanctions/detail",
+    "tags": [
+      "制裁",
+      "出口管制",
+      "UBO筛查"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 111,
+    "unitPrice": "0.80",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-031",
+    "serial": 31,
+    "operationId": "companiesKybScreen",
+    "category": "专项风险与交易情报",
+    "nameZh": "企业 KYB 尽调",
+    "nameEn": "companiesKybScreen",
+    "description": "通过 LLM 核验企业身份、注册识别、法律状态、地址、负责人、业务活动和官方网络信息，并输出非风险型数据质量与数字足迹评估。",
+    "method": "POST",
+    "path": "/api/v1/companies/kyb/screen",
+    "tags": [
+      "身份核验",
+      "法律状态",
+      "业务活动",
+      "数字足迹"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "否",
+        "-",
+        "body"
+      ]
+    ],
+    "responseFieldCount": 112,
+    "unitPrice": "0.50",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-032",
+    "serial": 32,
+    "operationId": "queryM9Data",
+    "category": "专项风险与交易情报",
+    "nameZh": "并购交易概述查询M9",
+    "nameEn": "queryM9Data",
+    "description": "获取企业并购概览、并购结构及日期、并购交易估值等并购交易数据。",
+    "method": "GET",
+    "path": "/glov2/modules/M9/data",
+    "tags": [
+      "并购概览",
+      "并购结构",
+      "交易估值"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.60",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  },
+  {
+    "apiId": "GC-API-033",
+    "serial": 33,
+    "operationId": "queryM8Data",
+    "category": "专项风险与交易情报",
+    "nameZh": "网络风险评级与隐含网络威胁概述查询M8",
+    "nameEn": "queryM8Data",
+    "description": "获取企业行业网络风险、网络风险评级及隐含网络威胁等网络安全评估数据。",
+    "method": "GET",
+    "path": "/glov2/modules/M8/data",
+    "tags": [
+      "网络风险",
+      "风险评级",
+      "隐含威胁",
+      "网络安全"
+    ],
+    "request": [
+      [
+        "eid",
+        "string",
+        "是",
+        "-",
+        "query"
+      ]
+    ],
+    "responseFieldCount": 9,
+    "unitPrice": "0.60",
+    "currency": "CNY",
+    "billingRule": "SUCCESS_ONLY",
+    "enabled": true
+  }
+]
