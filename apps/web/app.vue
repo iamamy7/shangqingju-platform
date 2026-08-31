@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: { lang: "zh-CN" },
-  link: [{ rel: "stylesheet", href: "/prototype/styles.css?v=brand-sqj-70" }],
+  link: [{ rel: "stylesheet", href: "/prototype/styles.css?v=global-positioning-71" }],
   meta: [
     { name: "theme-color", content: "#ffffff" },
     { name: "viewport", content: "width=device-width, initial-scale=1" }
@@ -22,7 +22,7 @@ onMounted(() => {
   if (!document.querySelector('script[data-sqj-prototype="web"]')) {
     const script = document.createElement("script");
     script.type = "module";
-    script.src = "/prototype/app.js?v=brand-sqj-70";
+    script.src = "/prototype/app.js?v=global-positioning-71";
     script.dataset.sqjPrototype = "web";
     document.body.appendChild(script);
   }

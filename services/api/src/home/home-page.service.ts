@@ -34,10 +34,10 @@ type CompanyPayload = Record<string, unknown> & {
 const defaultConfig: HomeConfig = {
   hero: {
     badge: { zh: "全球企业情报 · 一查即明", en: "Global company intelligence · Clear at a glance" },
-    title: { zh: "做生意之前，先把企业查明白", en: "Before you do business, know the company." },
+    title: { zh: "查全球企业，就用商情据", en: "Global companies. Clear intelligence." },
     description: {
-      zh: "查身份、穿透股权、识别风险、读懂经营。全球企业情报一次汇集，让合作、投资与采购更有底气。",
-      en: "Verify identity, trace ownership, identify risk and understand operations—all in one place for more confident decisions."
+      zh: "汇集全球企业主体、股权、司法、财务与经营信息，把分散数据变成可核验、可追溯的商业判断。",
+      en: "Bring global company identity, ownership, legal, financial and operating data together as verifiable, traceable business intelligence."
     },
     scopeTitle: { zh: "选择数据范围", en: "Choose a database" },
     scopeNote: { zh: "全球库与国内库独立查询", en: "Global and Mainland China databases are searched independently" },

@@ -137,6 +137,7 @@ export class DatabaseService implements OnModuleDestroy {
         ON company_search_events(queried_at DESC, company_id);
     `);
     this.migrateBrandName();
+    this.migrateHomepagePositioning();
   }
 
   private migrateBrandName() {
@@ -169,6 +170,39 @@ export class DatabaseService implements OnModuleDestroy {
           SET note = replace(note, '商情局', '商情据')
           WHERE note IS NOT NULL AND instr(note, '商情局') > 0;
       `);
+      this.connection.prepare("INSERT INTO system_meta(key, value) VALUES (?, ?)")
+        .run(migrationKey, new Date().toISOString());
+      this.connection.exec("COMMIT");
+    } catch (error) {
+      this.connection.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  private migrateHomepagePositioning() {
+    const migrationKey = "homepage_global_positioning_20260831";
+    const migrated = this.connection.prepare("SELECT value FROM system_meta WHERE key = ?").get(migrationKey);
+    if (migrated) return;
+
+    const replacements = [
+      ["做生意之前，先把企业查明白", "查全球企业，就用商情据"],
+      ["Before you do business, know the company.", "Global companies. Clear intelligence."],
+      [
+        "查身份、穿透股权、识别风险、读懂经营。全球企业情报一次汇集，让合作、投资与采购更有底气。",
+        "汇集全球企业主体、股权、司法、财务与经营信息，把分散数据变成可核验、可追溯的商业判断。"
+      ],
+      [
+        "Verify identity, trace ownership, identify risk and understand operations—all in one place for more confident decisions.",
+        "Bring global company identity, ownership, legal, financial and operating data together as verifiable, traceable business intelligence."
+      ]
+    ] as const;
+
+    this.connection.exec("BEGIN IMMEDIATE");
+    try {
+      const update = this.connection.prepare(`UPDATE homepage_content
+        SET payload_json = replace(payload_json, ?, ?)
+        WHERE instr(payload_json, ?) > 0`);
+      for (const [from, to] of replacements) update.run(from, to, from);
       this.connection.prepare("INSERT INTO system_meta(key, value) VALUES (?, ?)")
         .run(migrationKey, new Date().toISOString());
       this.connection.exec("COMMIT");
