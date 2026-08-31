@@ -27,7 +27,7 @@ function signOut() {
 <template>
   <main class="shell">
     <aside>
-      <div class="brand"><b>SQJ</b><span>商情据</span></div>
+      <div class="brand"><img src="/assets/sqj-mark-v4.svg" alt="" /><span><b>商情据</b><small>官方运营工作台</small></span></div>
       <nav v-for="group in menus" :key="group.group">
         <p>{{ group.group }}</p>
         <button
@@ -43,7 +43,7 @@ function signOut() {
     <section class="stage">
       <header>
         <input placeholder="搜索客户、订单、报告任务或接口" /><span
-          >● Mock 运营环境</span
+          >● 测试运营环境</span
         >
         <div><b>运营管理员</b><button @click="signOut">退出登录</button></div>
       </header>
@@ -225,51 +225,46 @@ function signOut() {
   margin: 0;
   font-family: Inter, "PingFang SC", sans-serif;
   color: #183b33;
-  background: #f4f7f6;
+  background: #f5f8f7;
 }
 .shell {
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 264px 1fr;
   min-height: 100vh;
 }
 aside {
   padding: 22px 14px;
-  background: #16846d;
+  background: #123a33;
   color: white;
 }
 .brand {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
   padding: 5px 10px 24px;
   border-bottom: 1px solid #ffffff27;
 }
-.brand b {
-  font-size: 27px;
-}
-.brand span {
-  font-size: 21px;
-  font-weight: 800;
-}
+.brand img{width:64px;height:40px;object-fit:contain}.brand span{display:grid;gap:2px}.brand b{font-size:20px}.brand small{color:#a9c9c0;font-size:11px;font-weight:500}
 nav p {
   margin: 22px 10px 6px;
-  color: #bde2d6;
-  font-size: 13px;
+  color: #91b9af;
+  font-size: 12px;
+  letter-spacing:.08em;
 }
 nav button {
   display: block;
   width: 100%;
   border: 0;
   background: transparent;
-  color: #edf9f5;
+  color: #dcece7;
   text-align: left;
   padding: 11px 13px;
   border-radius: 9px;
   font-size: 15px;
 }
 nav button.active {
-  background: #d7f6eb;
-  color: #08715b;
+  background: #dff5ed;
+  color: #006f56;
   font-weight: 850;
 }
 .stage header {
@@ -289,7 +284,7 @@ nav button.active {
   font-size: 15px;
 }
 .stage header > span {
-  color: #16846d;
+  color: #008f6a;
 }
 .stage header > div {
   margin-left: auto;
@@ -308,7 +303,7 @@ nav button.active {
   padding: 35px;
 }
 .content > p {
-  color: #e56248;
+  color: #008f6a;
   font-size: 13px;
   letter-spacing: 0.16em;
   font-weight: 900;
@@ -328,7 +323,7 @@ nav button.active {
   padding: 20px;
   background: #fff;
   border: 1px solid #dce6e3;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 .stats strong {
   font-size: 26px;
@@ -342,7 +337,7 @@ nav button.active {
   padding: 22px;
   background: #fff;
   border: 1px solid #dce6e3;
-  border-radius: 15px;
+  border-radius: 14px;
 }
 .panel h2 {
   font-size: 19px;
@@ -355,7 +350,7 @@ nav button.active {
 }
 .todo b {
   padding: 20px;
-  background: #eff7f4;
+  background: #f0f7f4;
   border-radius: 10px;
 }
 .toolbar,
@@ -369,8 +364,8 @@ nav button.active {
 .panel td button {
   border: 0;
   border-radius: 8px;
-  background: #e5f5ef;
-  color: #08715b;
+  background: #e4f5ef;
+  color: #00765a;
   padding: 10px 14px;
   font-weight: 750;
 }
@@ -419,7 +414,7 @@ td input {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: #16846d;
+    background: #123a33;
   }
   .stats {
     grid-template-columns: 1fr 1fr;

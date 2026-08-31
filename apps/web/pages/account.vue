@@ -31,11 +31,13 @@ async function signOut() {
 }
 </script>
 <template>
-  <main>
-    <header>
-      <NuxtLink to="/">SQJ <span>商情据</span></NuxtLink
-      ><b>个人中心</b><button @click="signOut">退出登录</button>
-    </header>
+  <div class="account-page">
+    <SqjSiteHeader />
+    <main>
+      <div class="account-topbar sqj-container">
+        <div><p class="sqj-kicker">ACCOUNT CENTER</p><h1>个人中心</h1></div>
+        <button @click="signOut">退出登录</button>
+      </div>
     <div class="shell">
       <aside>
         <div class="profile">
@@ -150,8 +152,10 @@ async function signOut() {
           </article></template
         >
       </section>
-    </div>
-  </main>
+      </div>
+    </main>
+    <SqjSiteFooter />
+  </div>
 </template>
 <script lang="ts">
 const OrderList = {
@@ -174,33 +178,14 @@ export default { components: { OrderList } };
   color: inherit;
   text-decoration: none;
 }
-header {
-  height: 72px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 0 5vw;
-  background: #fff;
-  border-bottom: 1px solid #dbe6e2;
-}
-header > a {
-  font-size: 22px;
-  font-weight: 900;
-}
-header > a span {
-  font-size: 18px;
-}
-header button {
-  justify-self: end;
-  border: 1px solid #e4bdb3;
-  background: #fff5f2;
-  color: #c84e36;
-  border-radius: 10px;
-  padding: 10px 16px;
-}
+.account-page{min-height:100vh;background:var(--sqj-cloud)}
+.account-page main{padding:34px 0 64px}
+.account-topbar{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid var(--sqj-line)}
+.account-topbar h1{margin:4px 0 0;font-family:var(--sqj-font-display);font-size:30px;letter-spacing:-.02em}
+.account-topbar button{padding:10px 15px;border:1px solid rgba(217,87,79,.28);border-radius:9px;color:var(--sqj-risk);background:#fff;cursor:pointer}
 .shell {
   max-width: 1240px;
-  margin: 28px auto;
+  margin: 24px auto 0;
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 20px;
@@ -210,7 +195,7 @@ header button {
 .content {
   background: #fff;
   border: 1px solid #dbe6e2;
-  border-radius: 18px;
+  border-radius: var(--sqj-radius-lg);
 }
 .shell > aside {
   padding: 18px;
@@ -227,8 +212,8 @@ header button {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #dff5ed;
-  color: #08785f;
+  background: rgba(0,183,132,.12);
+  color: var(--sqj-flight-deep);
   font-style: normal;
   font-weight: 900;
 }
@@ -252,8 +237,8 @@ header button {
   color: #526c65;
 }
 .shell > aside > button.active {
-  background: #e1f5ee;
-  color: #08785f;
+  background: rgba(0,183,132,.1);
+  color: var(--sqj-flight-deep);
   font-weight: 800;
 }
 .content {
@@ -261,6 +246,7 @@ header button {
   min-height: 650px;
 }
 .content h1 {
+  font-family:var(--sqj-font-display);
   font-size: 30px;
 }
 .stats {
@@ -272,7 +258,7 @@ header button {
 .panel {
   padding: 22px;
   border: 1px solid #dde7e4;
-  border-radius: 15px;
+  border-radius: var(--sqj-radius-md);
 }
 .stats article {
   display: grid;
@@ -298,7 +284,7 @@ header button {
   color: #6b7d77;
 }
 .orders a {
-  color: #08785f;
+  color: var(--sqj-flight-deep);
   font-weight: 800;
 }
 .methods {
@@ -311,7 +297,7 @@ header button {
   border: 0;
   border-radius: 10px;
   padding: 13px 18px;
-  background: #0a9f7b;
+  background: var(--sqj-flight-deep);
   color: #fff;
   font-weight: 800;
 }
@@ -351,12 +337,7 @@ header button {
   color: #d64b35;
 }
 @media (max-width: 800px) {
-  header {
-    grid-template-columns: 1fr auto;
-  }
-  header > b {
-    display: none;
-  }
+  .account-topbar{padding-inline:20px}
   .shell {
     grid-template-columns: 1fr;
   }
