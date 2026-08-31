@@ -23,7 +23,7 @@ onMounted(load);
 <template>
   <main>
     <section>
-      <NuxtLink to="/">SQJ 商情据</NuxtLink>
+      <NuxtLink class="brand" to="/"><img src="/assets/sqj-mark-v4.svg" alt="" /><span><b>商情据</b><small>企业调查报告</small></span></NuxtLink>
       <p>REPORT GENERATION</p>
       <h1>{{ error ? "无法打开报告任务" : "报告已经生成完成" }}</h1>
       <div v-if="task" class="progress">
@@ -61,11 +61,16 @@ section {
   box-shadow: 0 22px 70px #16372f1c;
   text-align: center;
 }
-section > a:first-child {
+.brand {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
   font-weight: 900;
   color: #153630;
   text-decoration: none;
 }
+.brand img{width:58px;height:38px;object-fit:contain}.brand span{display:grid;text-align:left}.brand b{font-size:18px}.brand small{color:#70837d;font-size:11px}
 section > p {
   color: #0a9f7b;
   font-weight: 800;

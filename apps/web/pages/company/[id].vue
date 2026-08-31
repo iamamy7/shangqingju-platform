@@ -34,10 +34,12 @@ function checkout() {
 }
 </script>
 <template>
+  <div class="company-page">
+  <SqjSiteHeader />
   <main>
     <header class="top">
-      <NuxtLink to="/">SQJ 商情据</NuxtLink><span>选择调查模块</span
-      ><NuxtLink to="/account">个人中心</NuxtLink>
+      <NuxtLink to="/">← 返回企业查询</NuxtLink><span>选择调查模块</span
+      ><small>按需组合 · 余额支付 · 报告交付</small>
     </header>
     <section class="subject">
       <p>已确认企业主体</p>
@@ -99,6 +101,8 @@ function checkout() {
       </aside>
     </div>
   </main>
+  <SqjSiteFooter />
+  </div>
 </template>
 <style scoped>
 :global(*) {
@@ -115,12 +119,12 @@ function checkout() {
   text-decoration: none;
 }
 .top {
-  height: 72px;
+  height: 58px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 6vw;
-  background: #fff;
+  background: #f8fbfa;
   border-bottom: 1px solid #dce7e3;
   font-weight: 800;
 }

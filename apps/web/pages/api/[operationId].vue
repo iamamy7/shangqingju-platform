@@ -11,9 +11,27 @@ const curlExample = computed(
   () =>
     `curl -X ${product.value?.method || "POST"} '${config.public.apiBase}${String(product.value?.path || "").replace(/^\/api\/v1/, "")}' \\\n  -H 'X-API-Key: <YOUR_API_KEY>' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"eid":"EID-MOCK-0001"}'`,
 );
+const activeSection = ref("overview");
+let sectionObserver: IntersectionObserver | undefined;
+onMounted(() => {
+  sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible?.target.id) activeSection.value = visible.target.id;
+    },
+    { rootMargin: "-20% 0px -65% 0px", threshold: [0, 0.2, 0.6] },
+  );
+  ["overview", "parameters", "example", "billing"].forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) sectionObserver?.observe(element);
+  });
+});
+onBeforeUnmount(() => sectionObserver?.disconnect());
 </script>
 
 <template>
+  <div class="detail-page">
+  <SqjSiteHeader />
   <main v-if="product" class="detail">
     <header>
       <NuxtLink to="/api-market">← 返回 API 市场</NuxtLink
@@ -31,9 +49,9 @@ const curlExample = computed(
     </section>
     <div class="body">
       <aside>
-        <strong>接口文档</strong><a href="#overview">01 概览</a
-        ><a href="#parameters">02 请求参数</a><a href="#example">03 调用示例</a
-        ><a href="#billing">04 计费说明</a>
+        <strong>接口文档</strong><a :class="{ active: activeSection === 'overview' }" href="#overview">01 概览</a
+        ><a :class="{ active: activeSection === 'parameters' }" href="#parameters">02 请求参数</a><a :class="{ active: activeSection === 'example' }" href="#example">03 调用示例</a
+        ><a :class="{ active: activeSection === 'billing' }" href="#billing">04 计费说明</a>
       </aside>
       <article>
         <section id="overview">
@@ -89,6 +107,8 @@ const curlExample = computed(
       </article>
     </div>
   </main>
+  <SqjSiteFooter />
+  </div>
 </template>
 
 <style scoped>
@@ -109,12 +129,12 @@ const curlExample = computed(
   text-decoration: none;
 }
 .detail > header {
-  height: 72px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 max(4vw, 22px);
-  background: #fff;
+  background: #f8fbfa;
   border-bottom: 1px solid #dbe6e2;
 }
 .detail {
@@ -181,9 +201,11 @@ const curlExample = computed(
   border-radius: 8px;
   color: #60736f;
 }
-.body aside a:hover {
+.body aside a:hover,
+.body aside a.active {
   background: #e6f5f0;
   color: #08785f;
+  font-weight:800;
 }
 .body article {
   display: grid;

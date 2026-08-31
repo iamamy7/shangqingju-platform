@@ -4,15 +4,14 @@ const item = useInsights().find((row) => row.id === route.params.id);
 if (!item) throw createError({ statusCode: 404, statusMessage: "资讯不存在" });
 </script>
 <template>
+  <div class="insight-detail-page">
+    <SqjSiteHeader />
   <main>
-    <header>
-      <NuxtLink to="/">SQJ 商情据</NuxtLink
-      ><NuxtLink to="/insights">← 返回热门资讯</NuxtLink>
-    </header>
+    <div class="article-nav"><NuxtLink to="/insights">← 返回热门资讯</NuxtLink><span>人工审核发布 · 来源可追溯</span></div>
     <article>
       <div class="meta">
         <span>{{ item?.category }}</span
-        ><time>2026-08-24 {{ item?.time }}</time>
+        ><time>内容库记录 · {{ item?.time }}</time>
       </div>
       <h1>{{ item?.title }}</h1>
       <p class="lead">{{ item?.summary }}</p>
@@ -42,6 +41,8 @@ if (!item) throw createError({ statusCode: 404, statusMessage: "资讯不存在"
       </footer>
     </article>
   </main>
+  <SqjSiteFooter />
+  </div>
 </template>
 <style scoped>
 :global(body) {
@@ -54,13 +55,13 @@ if (!item) throw createError({ statusCode: 404, statusMessage: "资讯不存在"
   color: inherit;
   text-decoration: none;
 }
-header {
-  height: 72px;
+.article-nav {
+  height: 58px;
   padding: 0 6vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: #f8fbfa;
   border-bottom: 1px solid #dde6e3;
   font-weight: 800;
 }

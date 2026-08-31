@@ -54,10 +54,12 @@ async function pay() {
 }
 </script>
 <template>
+  <div class="checkout-page">
+  <SqjSiteHeader />
   <main>
     <header>
-      <NuxtLink to="/">SQJ 商情据</NuxtLink><b>确认订单</b
-      ><NuxtLink to="/account">个人中心</NuxtLink>
+      <NuxtLink :to="`/company/${companyId}`">← 返回模块选择</NuxtLink><b>确认订单</b
+      ><span>余额支付 · 登录后交付</span>
     </header>
     <div class="wrap">
       <section>
@@ -90,11 +92,11 @@ async function pay() {
             ><input v-model="channel" value="BALANCE" type="radio" />
             账户余额</label
           ><label
-            ><input v-model="channel" value="WECHAT_MOCK" type="radio" />
-            微信支付 <em>示例接口</em></label
+            class="unavailable"><input v-model="channel" value="WECHAT_MOCK" type="radio" disabled />
+            微信支付 <em>暂未开发</em></label
           ><label
-            ><input v-model="channel" value="ALIPAY_MOCK" type="radio" /> 支付宝
-            <em>示例接口</em></label
+            class="unavailable"><input v-model="channel" value="ALIPAY_MOCK" type="radio" disabled /> 支付宝
+            <em>暂未开发</em></label
           >
         </article>
         <article>
@@ -115,9 +117,6 @@ async function pay() {
         ><span
           >组合优惠 <b>-¥{{ quote?.discount }}</b></span
         ><strong>应付 ¥{{ quote?.total }}</strong>
-        <p v-if="channel !== 'BALANCE'">
-          当前为 Mock/示例支付，不会发生真实扣款。
-        </p>
         <p v-if="error" class="error">{{ error }}</p>
         <button :disabled="pending" @click="pay">
           {{ pending ? "处理中…" : "确认支付并生成报告" }}
@@ -125,6 +124,8 @@ async function pay() {
       </aside>
     </div>
   </main>
+  <SqjSiteFooter />
+  </div>
 </template>
 <style scoped>
 :global(*) {
@@ -141,7 +142,7 @@ async function pay() {
   text-decoration: none;
 }
 header {
-  height: 72px;
+  height: 58px;
   padding: 0 6vw;
   display: flex;
   align-items: center;
@@ -171,7 +172,7 @@ header {
 }
 article,
 aside {
-  background: #fff;
+  background: #f8fbfa;
   border: 1px solid #dae5e1;
   border-radius: 18px;
   padding: 24px;
@@ -192,6 +193,7 @@ article label {
   padding: 12px 0;
   font-weight: 700;
 }
+article label.unavailable{color:#82918d;cursor:not-allowed}
 article em {
   font-style: normal;
   color: #e96247;
