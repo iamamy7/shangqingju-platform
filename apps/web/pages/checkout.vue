@@ -56,7 +56,7 @@ async function pay() {
 <template>
   <main>
     <header>
-      <NuxtLink to="/">SQJ 商情局</NuxtLink><b>确认订单</b
+      <NuxtLink to="/">SQJ 商情据</NuxtLink><b>确认订单</b
       ><NuxtLink to="/account">个人中心</NuxtLink>
     </header>
     <div class="wrap">

@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="40 50 1400 320" role="img" aria-labelledby="title">
-  <title id="title">商情局 SQJ 飞行数据链组合标深色背景版</title>
+  <title id="title">商情据 SQJ 飞行数据链组合标深色背景版</title>
   <g transform="translate(56 70) scale(.78)">
     <g transform="translate(52 20) skewX(-8)"><path d="M258 62H101C61 62 36 87 36 116C36 145 59 166 99 166H204C242 166 266 188 266 218C266 249 241 270 200 270H30" fill="none" stroke="#F6F7F4" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/></g>
-    <g transform="translate(8 20) skewX(-8)"><ellipse cx="454" cy="166" rx="112" ry="105" fill="none" stroke="#00D69A" stroke-width="58"/><path d="M509 215L582 282" fill="none" stroke="#00D69A" stroke-width="58" stroke-linecap="square"/><rect x="560" y="258" width="42" height="42" rx="6" fill="#00D69A"/></g>
+    <g transform="translate(8 20) skewX(-8)"><ellipse cx="454" cy="166" rx="112" ry="105" fill="none" stroke="#00B784" stroke-width="58"/><path d="M509 215L582 282" fill="none" stroke="#00B784" stroke-width="58" stroke-linecap="square"/><rect x="560" y="258" width="42" height="42" rx="6" fill="#00B784"/></g>
     <g transform="translate(4 20) skewX(-8)"><path d="M566 62H804M780 64V189C780 240 744 270 690 270H626" fill="none" stroke="#F6F7F4" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/></g>
   </g>
   <rect x="772" y="87" width="2" height="246" fill="#324047"/>
-  <text x="838" y="205" fill="#F6F7F4" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="96" font-weight="700" letter-spacing="8">商情局</text>
-  <text x="842" y="274" fill="#00D69A" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="500" letter-spacing="5">全球企业情报，一查即明</text>
+  <text x="838" y="205" fill="#F6F7F4" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="96" font-weight="700" letter-spacing="8">商情据</text>
+  <text x="842" y="274" fill="#00B784" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="500" letter-spacing="5">全球企业情报，一查即明</text>
   <text x="842" y="323" fill="#9CA8A7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="3">SOURCES · QUERY · JUDGMENT</text>
 </svg>

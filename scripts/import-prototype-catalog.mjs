@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sourcePath = path.resolve(root, "../商情局_可交互原型_v1.0/app.js");
+const sourcePath = path.resolve(root, "../商情据_可交互原型_v1.0/app.js");
 const outputPath = path.resolve(root, "services/api/fixtures/api-products.json");
 const source = fs.readFileSync(sourcePath, "utf8");
 

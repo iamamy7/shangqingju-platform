@@ -6,7 +6,7 @@ const assetBase = runtimeConfig.app.baseURL.endsWith("/")
 
 useHead({
   htmlAttrs: { lang: "zh-CN" },
-  link: [{ rel: "stylesheet", href: `${assetBase}prototype/styles.css?v=formal-admin-68` }],
+  link: [{ rel: "stylesheet", href: `${assetBase}prototype/styles.css?v=brand-sqj-69` }],
   meta: [
     { name: "theme-color", content: "#f4f8f6" },
     { name: "viewport", content: "width=device-width, initial-scale=1" }
@@ -28,7 +28,7 @@ onMounted(() => {
   if (!document.querySelector('script[data-sqj-prototype="admin"]')) {
     const script = document.createElement("script");
     script.type = "module";
-    script.src = `${assetBase}prototype/app.js?v=formal-admin-68`;
+    script.src = `${assetBase}prototype/app.js?v=brand-sqj-69`;
     script.dataset.sqjPrototype = "admin";
     document.body.appendChild(script);
   }

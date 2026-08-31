@@ -17,7 +17,7 @@ const curlExample = computed(
   <main v-if="product" class="detail">
     <header>
       <NuxtLink to="/api-market">← 返回 API 市场</NuxtLink
-      ><strong>SQJ 商情局开发文档</strong>
+      ><strong>SQJ 商情据开发文档</strong>
     </header>
     <section class="hero">
       <p>{{ product.apiId }} · {{ product.category }}</p>

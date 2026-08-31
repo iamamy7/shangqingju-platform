@@ -1,11 +1,11 @@
-# 商情局 Mock 上游 API v1.0
+# 商情据 Mock 上游 API v1.0
 
 这是一个零第三方依赖的本地联调服务，用来在真实上游尚未接入时跑通完整业务闭环。所有企业、价格、人员、风险、财务与报告均为合成测试数据。
 
 ## 启动
 
 ```bash
-cd "/Users/wangjing/Desktop/全球查数据/商情局_mock_api"
+cd "/Users/wangjing/Desktop/全球查数据/商情据_mock_api"
 npm start
 ```
 
@@ -42,9 +42,9 @@ curl 'http://127.0.0.1:4190/open/v1/companies/SQJ-DEMO-US-0001/modules/M08' \
 
 OpenAPI：`http://127.0.0.1:4190/openapi.yaml`
 
-内容产品接口：`GET /open/v1/insights` 返回大宗数据、投资日报、金融市场、上市企业、其他五个子模块，每个模块至少 10 条内容，以及生意社、金十数据、投中网、华尔街见闻、同花顺、雪球六个线索源；`GET /open/v1/insights/{insightId}` 返回商情局原创分析正文，原始披露只作为文末事实参考。为补足分页联调而扩展的内容会明确标记为 Mock 样稿，正式发布前必须人工复核。后台通过 `GET /open/v1/admin/insight-agent` 查看来源状态和发布队列，并可用 `POST /open/v1/admin/insight-agent/runs` 模拟启动每日批次。
+内容产品接口：`GET /open/v1/insights` 返回大宗数据、投资日报、金融市场、上市企业、其他五个子模块，每个模块至少 10 条内容，以及生意社、金十数据、投中网、华尔街见闻、同花顺、雪球六个线索源；`GET /open/v1/insights/{insightId}` 返回商情据原创分析正文，原始披露只作为文末事实参考。为补足分页联调而扩展的内容会明确标记为 Mock 样稿，正式发布前必须人工复核。后台通过 `GET /open/v1/admin/insight-agent` 查看来源状态和发布队列，并可用 `POST /open/v1/admin/insight-agent/runs` 模拟启动每日批次。
 
-商情局与全球查属于同一业务主体，面向不同客户群体并共用同一数据源。API 与余额充值：`GET /open/v1/api-products` 返回与全球查完全一致的 33 个接口 OperationId、请求方式、路径和元/次单价；`POST /open/v1/api-balance-orders` 创建微信、支付宝或对公转账的人民币 API 预存余额订单；`GET /open/v1/customers/{customerId}/api-wallet` 查询人民币余额与充值记录。商情局对客统一使用 `X-API-Key`，全球查等上游鉴权仅保存在服务端适配层，不暴露给客户。
+商情据与全球查属于同一业务主体，面向不同客户群体并共用同一数据源。API 与余额充值：`GET /open/v1/api-products` 返回与全球查完全一致的 33 个接口 OperationId、请求方式、路径和元/次单价；`POST /open/v1/api-balance-orders` 创建微信、支付宝或对公转账的人民币 API 预存余额订单；`GET /open/v1/customers/{customerId}/api-wallet` 查询人民币余额与充值记录。商情据对客统一使用 `X-API-Key`，全球查等上游鉴权仅保存在服务端适配层，不暴露给客户。
 
 支付、充值与开票响应中的 `integrationMode: MOCK_EXAMPLE` 表示当前只是流程示例，不会发起真实扣款或开票；正式接口接入时替换 Provider Adapter 即可。
 

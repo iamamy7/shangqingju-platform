@@ -12,8 +12,8 @@ from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = [
-    ROOT / "output/pdf/Northstar_Components_商情局企业调查报告_V1.pdf",
-    ROOT / "apps/web/public/prototype/downloads/Northstar_Components_商情局企业调查报告_V1.pdf",
+    ROOT / "output/pdf/Northstar_Components_商情据企业调查报告_V1.pdf",
+    ROOT / "apps/web/public/prototype/downloads/Northstar_Components_商情据企业调查报告_V1.pdf",
 ]
 FONT = "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"
 pdfmetrics.registerFont(TTFont("SQJ-CJK", FONT))
@@ -82,12 +82,12 @@ def build(path):
     doc = SimpleDocTemplate(
         str(path), pagesize=A4, rightMargin=18 * mm, leftMargin=18 * mm,
         topMargin=18 * mm, bottomMargin=18 * mm,
-        title="商情局 · Northstar Components Inc. 企业调查报告",
-        author="商情局",
+        title="商情据 · Northstar Components Inc. 企业调查报告",
+        author="商情据",
     )
     story = [
         Spacer(1, 26 * mm),
-        p("SQJ · 商情局", "cover_kicker"),
+        p("SQJ · 商情据", "cover_kicker"),
         p("Northstar Components Inc.", "cover_title"),
         p("企业调查报告 · V1", "cover_sub"),
         Spacer(1, 15 * mm),

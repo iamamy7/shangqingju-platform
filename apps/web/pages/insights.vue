@@ -18,7 +18,7 @@ const filtered = computed(() =>
 <template>
   <main>
     <header>
-      <NuxtLink to="/">SQJ 商情局</NuxtLink>
+      <NuxtLink to="/">SQJ 商情据</NuxtLink>
       <nav>
         <NuxtLink to="/">首页</NuxtLink><b>热门资讯</b
         ><NuxtLink to="/api-market">数据 API</NuxtLink>
@@ -29,7 +29,7 @@ const filtered = computed(() =>
       <p>MARKET INTELLIGENCE</p>
       <h1>今日商业情报</h1>
       <span
-        >由 Agent 聚合公开信息，经过人工审核，并形成商情局原创深度解读。</span
+        >由 Agent 聚合公开信息，经过人工审核，并形成商情据原创深度解读。</span
       >
     </section>
     <div class="layout">

@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: 商情局 Mock Upstream API
+  title: 商情据 Mock Upstream API
   version: 1.0.0
   description: |
     面向联调与验收的合成数据 API。返回数据不代表真实企业、价格或上游能力。
@@ -30,12 +30,12 @@ paths:
   /open/v1/insights:
     get:
       summary: 每日一级市场与二级市场深度资讯
-      description: 返回商情局每日刊、六个线索源、五个内容子模块及带独立分析正文的文章列表；原始来源仅用于事实核验。
+      description: 返回商情据每日刊、六个线索源、五个内容子模块及带独立分析正文的文章列表；原始来源仅用于事实核验。
       responses:
         "200": { $ref: "#/components/responses/Envelope" }
   /open/v1/insights/{insightId}:
     get:
-      summary: 获取商情局原创深度文章
+      summary: 获取商情据原创深度文章
       parameters:
         - name: insightId
           in: path
@@ -174,7 +174,7 @@ paths:
                 invoice:
                   type: object
                   properties:
-                    title: { type: string, example: 商情局演示科技有限公司 }
+                    title: { type: string, example: 商情据演示科技有限公司 }
                     taxId: { type: string, example: 91310000DEMO202608 }
                     registeredAddress: { type: string, example: 上海市浦东新区演示路 88 号 }
                     registeredPhone: { type: string, example: 021-60000000 }
@@ -375,7 +375,7 @@ paths:
         "404": { $ref: "#/components/responses/ErrorEnvelope" }
 components:
   securitySchemes:
-    ApiKey: { type: apiKey, in: header, name: X-API-Key, description: 商情局对客统一鉴权凭证，仅通过 HTTPS 请求头传输；上游凭证由服务端 Provider Adapter 管理。 }
+    ApiKey: { type: apiKey, in: header, name: X-API-Key, description: 商情据对客统一鉴权凭证，仅通过 HTTPS 请求头传输；上游凭证由服务端 Provider Adapter 管理。 }
   parameters:
     CompanyId:
       name: companyId

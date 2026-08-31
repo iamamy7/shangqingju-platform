@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "商情局｜全球企业情报",
+      title: "商情据｜全球企业情报",
       meta: [{ name: "description", content: "全球与国内企业检索、报告、资讯及数据 API" }]
     }
   }

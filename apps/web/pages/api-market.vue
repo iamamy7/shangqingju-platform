@@ -17,7 +17,7 @@ watch(activeCategory, () => refresh());
 
 <template>
   <main class="api-page">
-    <header class="topbar"><NuxtLink to="/" class="brand"><img src="/sqj-lockup-v4.svg" alt="商情局" /></NuxtLink><strong>数据 API 市场</strong><NuxtLink to="/">返回产品首页</NuxtLink></header>
+    <header class="topbar"><NuxtLink to="/" class="brand"><img src="/sqj-lockup-v4.svg" alt="商情据" /></NuxtLink><strong>数据 API 市场</strong><NuxtLink to="/">返回产品首页</NuxtLink></header>
     <div class="workspace">
       <aside>
         <h2>API 分类</h2><p>33 个企业数据接口</p>

@@ -136,6 +136,46 @@ export class DatabaseService implements OnModuleDestroy {
       CREATE INDEX IF NOT EXISTS company_search_events_trending_idx
         ON company_search_events(queried_at DESC, company_id);
     `);
+    this.migrateBrandName();
+  }
+
+  private migrateBrandName() {
+    const migrationKey = "brand_name_shangqingju_to_shangqingju_20260831";
+    const migrated = this.connection.prepare("SELECT value FROM system_meta WHERE key = ?").get(migrationKey);
+    if (migrated) return;
+
+    this.connection.exec("BEGIN IMMEDIATE");
+    try {
+      this.connection.exec(`
+        UPDATE homepage_content
+          SET payload_json = replace(payload_json, '商情局', '商情据')
+          WHERE instr(payload_json, '商情局') > 0;
+        UPDATE insight_articles SET
+          title = replace(title, '商情局', '商情据'),
+          title_zh = replace(title_zh, '商情局', '商情据'),
+          summary = replace(summary, '商情局', '商情据'),
+          summary_zh = replace(summary_zh, '商情局', '商情据'),
+          source = replace(source, '商情局', '商情据'),
+          source_zh = replace(source_zh, '商情局', '商情据'),
+          payload_json = replace(payload_json, '商情局', '商情据')
+          WHERE instr(title, '商情局') > 0
+             OR instr(title_zh, '商情局') > 0
+             OR instr(summary, '商情局') > 0
+             OR instr(summary_zh, '商情局') > 0
+             OR instr(source, '商情局') > 0
+             OR instr(source_zh, '商情局') > 0
+             OR instr(payload_json, '商情局') > 0;
+        UPDATE insight_audit_logs
+          SET note = replace(note, '商情局', '商情据')
+          WHERE note IS NOT NULL AND instr(note, '商情局') > 0;
+      `);
+      this.connection.prepare("INSERT INTO system_meta(key, value) VALUES (?, ?)")
+        .run(migrationKey, new Date().toISOString());
+      this.connection.exec("COMMIT");
+    } catch (error) {
+      this.connection.exec("ROLLBACK");
+      throw error;
+    }
   }
 
   onModuleDestroy() {

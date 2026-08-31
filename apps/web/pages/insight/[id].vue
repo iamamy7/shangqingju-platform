@@ -6,7 +6,7 @@ if (!item) throw createError({ statusCode: 404, statusMessage: "资讯不存在"
 <template>
   <main>
     <header>
-      <NuxtLink to="/">SQJ 商情局</NuxtLink
+      <NuxtLink to="/">SQJ 商情据</NuxtLink
       ><NuxtLink to="/insights">← 返回热门资讯</NuxtLink>
     </header>
     <article>
@@ -17,7 +17,7 @@ if (!item) throw createError({ statusCode: 404, statusMessage: "资讯不存在"
       <h1>{{ item?.title }}</h1>
       <p class="lead">{{ item?.summary }}</p>
       <div class="source">
-        信息来源：{{ item?.source }}　｜　本文为商情局基于公开资料形成的原创分析
+        信息来源：{{ item?.source }}　｜　本文为商情据基于公开资料形成的原创分析
       </div>
       <section>
         <h2>为什么这条信息值得关注</h2>

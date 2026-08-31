@@ -36,7 +36,7 @@ function checkout() {
 <template>
   <main>
     <header class="top">
-      <NuxtLink to="/">SQJ 商情局</NuxtLink><span>选择调查模块</span
+      <NuxtLink to="/">SQJ 商情据</NuxtLink><span>选择调查模块</span
       ><NuxtLink to="/account">个人中心</NuxtLink>
     </header>
     <section class="subject">

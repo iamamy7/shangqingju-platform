@@ -131,9 +131,9 @@ function expandInsightCatalog(data) {
         tag: "Mock editorial sample · Human review required",
         metric: `NO.${String(index + 1).padStart(2, "0")}`,
         title: `${theme}: a structured market-intelligence checklist`,
-        titleZh: `${theme}：商情局结构化观察`,
+        titleZh: `${theme}：商情据结构化观察`,
         summary: `A mock editorial brief showing how Shangqingju would verify public signals, separate facts from interpretation and list follow-up indicators for ${theme}.`,
-        summaryZh: `这是一条用于联调的内容样稿，围绕“${theme}”展示商情局如何核验公开线索、区分事实与判断，并列出后续观察指标。`,
+        summaryZh: `这是一条用于联调的内容样稿，围绕“${theme}”展示商情据如何核验公开线索、区分事实与判断，并列出后续观察指标。`,
         thesis: `The value is not a single headline, but a repeatable framework for validating ${theme} with multiple public signals.`,
         thesisZh: `这条内容的价值不在单一标题，而在于用可重复的方法持续验证“${theme}”，避免把孤立信号直接当成结论。`,
         publishedAt: `2026-08-16T${String(8 + Math.floor(index / 6)).padStart(2,"0")}:${String((index * 7) % 60).padStart(2,"0")}:00+08:00`,
@@ -234,7 +234,7 @@ async function readBody(req) {
 }
 function authenticate(req, res) {
   if (req.headers["x-api-key"] !== expectedApiKey) {
-    sendError(req, res, 401, "UNAUTHORIZED", "请通过 HTTPS 请求头 X-API-Key 提交有效的商情局 API Key。");
+    sendError(req, res, 401, "UNAUTHORIZED", "请通过 HTTPS 请求头 X-API-Key 提交有效的商情据 API Key。");
     return false;
   }
   return true;
@@ -694,6 +694,6 @@ const server = http.createServer(async (req, res) => {
 
 server.startedAt = now();
 server.listen(port, host, () => {
-  console.log(`商情局 Mock API running on ${host}:${port} (local: http://127.0.0.1:${port})`);
+  console.log(`商情据 Mock API running on ${host}:${port} (local: http://127.0.0.1:${port})`);
   console.log(`mode=${upstreamMode} auth=X-API-Key`);
 });

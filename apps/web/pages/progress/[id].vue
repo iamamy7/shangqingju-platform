@@ -23,7 +23,7 @@ onMounted(load);
 <template>
   <main>
     <section>
-      <NuxtLink to="/">SQJ 商情局</NuxtLink>
+      <NuxtLink to="/">SQJ 商情据</NuxtLink>
       <p>REPORT GENERATION</p>
       <h1>{{ error ? "无法打开报告任务" : "报告已经生成完成" }}</h1>
       <div v-if="task" class="progress">

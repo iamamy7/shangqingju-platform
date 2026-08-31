@@ -69,7 +69,7 @@ const defaultConfig: HomeConfig = {
     industryTitle: { zh: "热门行业与代表企业", en: "Industries and example companies" },
     industryNote: { zh: "每个入口都关联数据库中的真实测试主体", en: "Every shortcut is linked to a database entity" },
     insightTitle: { zh: "每天精选值得关注的市场信号", en: "Daily selection of consequential market signals" },
-    insightNote: { zh: "公开来源核验 · 商情局独立解读 · 人工审核发布", en: "Verified sources · Independent analysis · Human reviewed" }
+    insightNote: { zh: "公开来源核验 · 商情据独立解读 · 人工审核发布", en: "Verified sources · Independent analysis · Human reviewed" }
   },
   featuredCompanyIds: ["SQJ-DEMO-US-0001", "SQJ-SYN-CN-0001", "SQJ-SYN-CN-0002", "SQJ-SYN-CN-0003"],
   industries: [

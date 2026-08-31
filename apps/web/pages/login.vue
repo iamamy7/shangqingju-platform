@@ -26,7 +26,7 @@ async function login() {
 <template>
   <main class="login-page">
     <section class="promo">
-      <NuxtLink to="/" class="brand">SQJ 商情局</NuxtLink>
+      <NuxtLink to="/" class="brand">SQJ 商情据</NuxtLink>
       <p>GLOBAL BUSINESS INTELLIGENCE</p>
       <h1>让全球企业信息，<br /><em>成为可靠的商业判断</em></h1>
       <span
@@ -36,7 +36,7 @@ async function login() {
       <div class="cap"><b>企业尽调</b><b>报告交付</b><b>数据 API</b></div>
     </section>
     <section class="card">
-      <h2>登录商情局</h2>
+      <h2>登录商情据</h2>
       <p>登录后继续订单、报告及账户服务</p>
       <label>手机号<input v-model="phone" /></label
       ><label

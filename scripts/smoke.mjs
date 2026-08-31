@@ -56,7 +56,7 @@ const admin = await json("/auth/admin/login", {
 assert.equal(admin.session.role, "ADMIN");
 
 for (const [name, url, expected] of [
-  ["web", process.env.SQJ_WEB_BASE || "http://localhost:3000", "商情局"],
+  ["web", process.env.SQJ_WEB_BASE || "http://localhost:3000", "商情据"],
   ["admin", process.env.SQJ_ADMIN_BASE || "http://localhost:3001/admin/", "官方运营后台"]
 ]) {
   const response = await fetch(url);

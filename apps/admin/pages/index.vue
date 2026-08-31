@@ -27,7 +27,7 @@ function signOut() {
 <template>
   <main class="shell">
     <aside>
-      <div class="brand"><b>SQJ</b><span>商情局</span></div>
+      <div class="brand"><b>SQJ</b><span>商情据</span></div>
       <nav v-for="group in menus" :key="group.group">
         <p>{{ group.group }}</p>
         <button

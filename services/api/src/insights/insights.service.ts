@@ -67,7 +67,7 @@ export class InsightsService implements OnModuleInit, OnModuleDestroy {
         scheduledAt: items[0]?.publishedAt || null
       },
       agent: {
-        name: "商情局市场情报 Agent",
+        name: "商情据市场情报 Agent",
         schedule: "07:30 / 12:00 / 17:00",
         reviewPolicy: "HUMAN_REVIEW_REQUIRED",
         workflow: ["线索采集", "归一化去重", "深度稿草稿", "人工审核", "发布"]
@@ -260,7 +260,7 @@ export class InsightsService implements OnModuleInit, OnModuleDestroy {
       readMinutes: Math.max(1, Number(raw.readMinutes || 6)),
       collectionRunId: runId,
       author: raw.author || "Shangqingju Research Agent · Pending human review",
-      authorZh: "商情局研究 Agent · 待人工复核"
+      authorZh: "商情据研究 Agent · 待人工复核"
     };
   }
 

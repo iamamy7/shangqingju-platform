@@ -12,6 +12,6 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL || "/",
-    head: { title: "商情局官方运营后台" }
+    head: { title: "商情据官方运营后台" }
   }
 });

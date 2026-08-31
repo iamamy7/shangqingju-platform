@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 0 862 332" role="img" aria-labelledby="title desc">
-  <title id="title">商情局 SQJ V4 标志</title>
-  <desc id="desc">由 S、查询镜头形态的 Q 与 J 组成的商情局紧凑图形标志</desc>
+  <title id="title">商情据 SQJ V4 标志</title>
+  <desc id="desc">由 S、查询镜头形态的 Q 与 J 组成的商情据紧凑图形标志</desc>
   <rect x="-12" width="862" height="332" rx="72" fill="#09171C"/>
   <g transform="translate(20 5) scale(.96)">
     <g transform="translate(52 20) skewX(-8)">
       <path d="M258 62H101C61 62 36 87 36 116C36 145 59 166 99 166H204C242 166 266 188 266 218C266 249 241 270 200 270H30" fill="none" stroke="#F7F6F1" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/>
     </g>
     <g transform="translate(8 20) skewX(-8)">
-      <ellipse cx="454" cy="166" rx="112" ry="105" fill="none" stroke="#00D69A" stroke-width="58"/>
-      <path d="M509 215L582 282" fill="none" stroke="#00D69A" stroke-width="58" stroke-linecap="square"/>
-      <rect x="560" y="258" width="42" height="42" rx="6" fill="#00D69A"/>
+      <ellipse cx="454" cy="166" rx="112" ry="105" fill="none" stroke="#00B784" stroke-width="58"/>
+      <path d="M509 215L582 282" fill="none" stroke="#00B784" stroke-width="58" stroke-linecap="square"/>
+      <rect x="560" y="258" width="42" height="42" rx="6" fill="#00B784"/>
     </g>
     <g transform="translate(4 20) skewX(-8)">
       <path d="M566 62H804M780 64V189C780 240 744 270 690 270H626" fill="none" stroke="#F7F6F1" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/>

@@ -57,7 +57,7 @@ try {
 
   const insightArticle = await request(`/open/v1/insights/${insights.payload.data.primaryMarket[0].id}`);
   assert(insightArticle.response.status === 200 && insightArticle.payload.data.articleZh.length >= 3, "独立文章接口返回完整分析正文");
-  assert(insightArticle.payload.provider.code === "MOCK_EDITORIAL_CONTENT_SERVICE", "文章由商情局内容服务交付而非跳转来源");
+  assert(insightArticle.payload.provider.code === "MOCK_EDITORIAL_CONTENT_SERVICE", "文章由商情据内容服务交付而非跳转来源");
 
   const insightAgent = await request("/open/v1/admin/insight-agent");
   assert(insightAgent.response.status === 200 && insightAgent.payload.data.queue.length >= 5, "资讯 Agent 后台返回每日发布队列");
@@ -92,7 +92,7 @@ try {
   assert(recharge.payload.data.integrationMode === "MOCK_EXAMPLE", "充值接口明确标记为 Mock 示例");
   assert(recharge.payload.data.balance === 868, "充值后账户余额实时增加");
 
-  const specialInvoice = { title: "商情局演示科技有限公司", taxId: "91310000DEMO202608", registeredAddress: "上海市浦东新区演示路 88 号", registeredPhone: "021-60000000", bankName: "中国工商银行上海演示支行", bankAccount: "100100000000000001", email: "invoice@example.com" };
+  const specialInvoice = { title: "商情据演示科技有限公司", taxId: "91310000DEMO202608", registeredAddress: "上海市浦东新区演示路 88 号", registeredPhone: "021-60000000", bankName: "中国工商银行上海演示支行", bankAccount: "100100000000000001", email: "invoice@example.com" };
   const orderBody = JSON.stringify({ customerId: smsSession.payload.data.customer.id, companyId: "SQJ-DEMO-US-0001", modules: ["M01", "M03", "M08"], amount: 200, invoiceRequested: true, invoiceType: "VAT_SPECIAL", invoice: specialInvoice });
   const order = await request("/open/v1/orders", { method: "POST", body: orderBody, headers: { "idempotency-key": "e2e-demo-order" } });
   assert(order.response.status === 201 && order.payload.data.status === "PENDING_PAYMENT", "登录客户可创建待支付订单");
@@ -154,7 +154,7 @@ try {
   assert(answer.payload.data.citations[0].chapter === "M08", "AI 回答引用 M08 证据");
   assert(answer.payload.data.groundedOnly === true, "AI 回答标记仅基于报告");
 
-  console.log("\n商情局 Mock API 端到端闭环验证通过。");
+  console.log("\n商情据 Mock API 端到端闭环验证通过。");
 } finally {
   child.kill("SIGTERM");
 }

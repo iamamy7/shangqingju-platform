@@ -33,7 +33,7 @@ async function signOut() {
 <template>
   <main>
     <header>
-      <NuxtLink to="/">SQJ <span>商情局</span></NuxtLink
+      <NuxtLink to="/">SQJ <span>商情据</span></NuxtLink
       ><b>个人中心</b><button @click="signOut">退出登录</button>
     </header>
     <div class="shell">
