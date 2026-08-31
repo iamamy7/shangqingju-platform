@@ -7,6 +7,24 @@ const searched = ref(false);
 const errorMessage = ref("");
 const candidates = ref<Array<Record<string, unknown>>>([]);
 const { user } = useSqjAuth();
+const { data: homepage, error: homepageError } = await useFetch<any>(
+  `${config.public.apiBase}/home`,
+);
+
+const hero = computed(() => homepage.value?.hero);
+const suggestions = computed<string[]>(() => {
+  const key = scope.value === "domestic" ? "CN" : "GLOBAL";
+  return hero.value?.suggestions?.[key] || [];
+});
+const searchPlaceholder = computed(() => {
+  const key = scope.value === "domestic" ? "CN" : "GLOBAL";
+  return hero.value?.placeholders?.[key]?.zh || "输入企业名称、注册号、品牌或地址";
+});
+
+function searchSuggestion(value: string) {
+  query.value = value;
+  void searchCompanies();
+}
 
 async function searchCompanies() {
   if (!query.value.trim()) return;
@@ -48,9 +66,10 @@ async function searchCompanies() {
       }}</NuxtLink>
     </header>
     <section class="hero">
-      <p class="eyebrow">GLOBAL BUSINESS INTELLIGENCE</p>
-      <h1>查清企业，洞见商业真相</h1>
-      <p>从全球企业数据到可信判断，让每一次合作、采购与投资更有依据。</p>
+      <p class="eyebrow">{{ hero?.badge?.zh || "全球企业情报" }}</p>
+      <h1>{{ hero?.title?.zh || "查全球企业，就用商情据" }}</h1>
+      <p>{{ hero?.description?.zh }}</p>
+      <p v-if="homepageError" class="config-error">首页内容读取失败，请稍后刷新。</p>
       <div class="search-card">
         <div class="scope">
           <button
@@ -69,14 +88,17 @@ async function searchCompanies() {
         <form @submit.prevent="searchCompanies">
           <input
             v-model="query"
-            placeholder="输入企业名称、注册号、品牌或地址"
+            :placeholder="searchPlaceholder"
           />
           <button type="submit" :disabled="pending">
             {{ pending ? "查询中…" : "查企业" }}
           </button>
         </form>
       </div>
-      <div class="hot-search"><span>热门搜索</span><button @click="query='Northstar Components'; searchCompanies()">Northstar Components</button><button @click="query='OpenAI'; searchCompanies()">OpenAI</button><button @click="query='上海青岚科技'; searchCompanies()">上海青岚科技</button></div>
+      <div class="hot-search">
+        <span>{{ hero?.hotLabel?.zh || "热门" }}</span>
+        <button v-for="item in suggestions" :key="item" @click="searchSuggestion(item)">{{ item }}</button>
+      </div>
     </section>
     <section v-if="searched" class="results" aria-live="polite">
       <header>
@@ -111,8 +133,14 @@ async function searchCompanies() {
         </article>
       </div>
     </section>
-    <section v-if="!searched" class="use-cases"><article><span>01</span><h3>跨境合作</h3><p>确认主体、股权与合规风险</p></article><article><span>02</span><h3>采购准入</h3><p>核查经营、司法与履约能力</p></article><article><span>03</span><h3>投资研究</h3><p>串联融资、年报与控制关系</p></article><article><span>04</span><h3>求职背调</h3><p>了解企业状态与经营风险</p></article></section>
-    <footer class="site-footer"><div><img src="/sqj-lockup-v4.svg" alt="商情据" /><p>查企业、读资讯、买报告，用可追溯的信息支持商业判断。</p></div><nav><strong>产品</strong><NuxtLink to="/">企业查询</NuxtLink><NuxtLink to="/insights">热门资讯</NuxtLink><NuxtLink to="/api-market">数据 API</NuxtLink></nav><nav><strong>服务</strong><NuxtLink to="/account">个人中心</NuxtLink><NuxtLink to="/login">登录 / 注册</NuxtLink></nav><aside><strong>微信扫码进入小程序</strong><div class="qr">商<br/>情<br/>局</div></aside><small>© 2026 商情据 · 合肥易尊数字科技有限公司</small></footer>
+    <section v-if="!searched" class="use-cases">
+      <article v-for="(item, index) in homepage?.scenarios?.items || []" :key="item.title.zh">
+        <span>{{ String(Number(index) + 1).padStart(2, "0") }}</span>
+        <h3>{{ item.tag.zh }}</h3>
+        <p>{{ item.title.zh }}</p>
+      </article>
+    </section>
+    <footer class="site-footer"><div><img src="/sqj-lockup-v4.svg" alt="商情据" /><p>{{ hero?.description?.zh }}</p></div><nav><strong>产品</strong><NuxtLink to="/">企业查询</NuxtLink><NuxtLink to="/insights">热门资讯</NuxtLink><NuxtLink to="/api-market">数据 API</NuxtLink></nav><nav><strong>服务</strong><NuxtLink to="/account">个人中心</NuxtLink><NuxtLink to="/login">登录 / 注册</NuxtLink></nav><aside><strong>微信扫码进入小程序</strong><div class="qr">商<br/>情<br/>据</div></aside><small>© 2026 商情据 · 合肥易尊数字科技有限公司</small></footer>
   </main>
 </template>
 

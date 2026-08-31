@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  pages: false,
+  pages: true,
   compatibilityDate: "2026-08-24",
   telemetry: false,
   experimental: { appManifest: false },
