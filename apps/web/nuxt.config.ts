@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
   pages: true,
+  css: ["~/assets/css/sqj-design-system.css"],
   compatibilityDate: "2026-08-24",
   telemetry: false,
   experimental: { appManifest: false },
